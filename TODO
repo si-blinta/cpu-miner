@@ -1,0 +1,23 @@
+Step 1:
+On upmem pim :
+    - Create a block ( with low difficulty)
+    - Send it to a single DPU
+    - Retrieve the Nonce
+    - Benchmarking
+Step 2:
+On normal architecture:
+    -Implement multithreading
+
+Step 3:
+On upmem pim :
+    -Use many DPUS
+    -Retrieve the right result
+    -Finish other DPUs
+    -Benchmarking
+
+Step 4:
+On upmem pim :
+    -Use tasklets
+    -Benchmarking
+Step 5:
+Rewrite cpu-miner : hardest step in theory
