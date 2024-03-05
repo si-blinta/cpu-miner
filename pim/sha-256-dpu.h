@@ -31,7 +31,14 @@ struct Sha_256 {
 	uint64_t total_len;
 	uint32_t h[8];
 };
-
+typedef struct {
+    int32_t version;                // Version of the block
+    uint8_t previous_hash[32];      // Hash of the previous block in the chain
+    uint8_t merkle_root_hash[32];   // Root hash of the Merkle tree of transactions in this block
+    uint32_t time;                  // Timestamp for when this block was created
+    uint32_t bits;                 // Difficulty
+    uint32_t nonce;                 // Counter used for proof-of-work algorithm
+} blockHeader;
 /*
  * @brief The simple SHA-256 calculation function.
  * @param hash Hash array, where the result is delivered.
