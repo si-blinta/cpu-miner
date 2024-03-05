@@ -1,13 +1,9 @@
-#ifndef SHA_256_H
-#define SHA_256_H
-#include <pthread.h>
+#ifndef SHA_256_DPU_H
+#define SHA_256_DPU_H
 #include <stdint.h>
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
 #include <stdlib.h>
-#define TRAILING_ZEROS(x) ((x)+6)/2
-#define EASY
 /*
  * @brief Size of the SHA-256 sum. This times eight is 256 bits.
  */
@@ -35,24 +31,6 @@ struct Sha_256 {
 	uint64_t total_len;
 	uint32_t h[8];
 };
-/*
- * @brief Structure representing a blockchain block header.
- */
-typedef struct {
-    int32_t version;                // Version of the block
-    uint8_t previous_hash[32];      // Hash of the previous block in the chain
-    uint8_t merkle_root_hash[32];   // Root hash of the Merkle tree of transactions in this block
-    uint32_t time;                  // Timestamp for when this block was created
-    uint32_t bits;                 // Difficulty
-    uint32_t nonce;                 // Counter used for proof-of-work algorithm
-} blockHeader;
-
-typedef struct {
-    blockHeader bh;
-    uint32_t nonceMax;
-    uint32_t* result;
-} ThreadData;
-
 
 /*
  * @brief The simple SHA-256 calculation function.
@@ -120,51 +98,6 @@ uint8_t *sha_256_close(struct Sha_256 *sha_256);
  * @param nBits Compact representation of the target hash.
  * @param target Buffer to store the calculated target hash.
  */
-void calculate_target_from_nbits(uint32_t nBits, uint8_t target[32]);
-
-/*
- * @brief Function to generate a random hash for testing purposes.
- * @param str Pointer to the buffer where the random hash will be stored.
- * @param size Size of the buffer.
- */
-void generate_random_hash(char *str, size_t size);
-
-/*
- * @brief Function to generate a random block header for testing purposes.
- * @param block_header Pointer to the block header structure to be populated.
- */
-void generate_block_header(blockHeader *block_header);
-
-/*
- * @brief Function to print out the contents of a block header.
- * @param blockHeader The block header to print.
- */
-void print_block_header(const blockHeader blockHeader);
-
-/*
- * @brief Function to concatenate the components of a block header into a single string.
- * @param blockHeader The block header to concatenate.
- * @return Pointer to the concatenated string.
- */
-char* concat_block_header(const blockHeader blockHeader);
-
-/*
- * @brief Function to compare two hashes byte by byte.
- * @param hash1 First hash for comparison.
- * @param hash2 Second hash for comparison.
- * @param size Size of the hash arrays.
- * @return -1 if hash1 < hash2, 1 if hash1 > hash2, 0 if equal.
- */
-int compare_hashes(const uint8_t *hash1, const uint8_t *hash2, size_t size);
-
-/*
- * @brief Function to test hashing performance by finding a hash less than a target
- * within a given nonce range and measuring the speed of hashes per second.
- * @param bh The block header for the hashing test.
- * @param nonceMax The maximum nonce value to be tested.
- * @return The nonce value that satisfies the condition, or -1 if not found.
- */
-uint32_t scan_hash_test(blockHeader bh, uint32_t nonceMax);
 
 
 

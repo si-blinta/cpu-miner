@@ -224,6 +224,7 @@ void calc_sha_256(uint8_t hash[SIZE_OF_SHA_256_HASH], const void *input, size_t 
 	sha_256_write(&sha_256, input, len);
 	(void)sha_256_close(&sha_256);
 }
+			
 void generate_block_header(blockHeader *block_header) {
     // Correctly generate random values for integers
     block_header->version = (uint32_t)rand(); 			    // Random version
@@ -231,7 +232,13 @@ void generate_block_header(blockHeader *block_header) {
     block_header->bits    = rand() %0x7fffff +0x008000 ;    // Mantissa maximum legal value = 0x7fffff,
 															// 0x008000 is the smallest legal   source : https://wiki.bitcoinsv.io/index.php/Difficulty 
 	uint8_t r             = rand() % 6 + 50;				// We limit the randomness of exponent because it may take infinite time with my potato pc 
+#ifdef EASY
+	uint32_t exponent     = TRAILING_ZEROS(54);	
+#endif //EASY
+
+#ifndef EASY	
 	uint32_t exponent     = TRAILING_ZEROS(r);				// this macro will make sure to have 50 to 56 trailing zeros so the target will start with
+#endif //EASY	
 															// at least (64-56-4) 4 zeros. 64 = nb bytes of sha256 hash, 56 = nb bytes as trailing zeros
 															// 4 = minimum of bytes as leading zeros that a mantissa can have (0x008000 is the smallest legal).
 	block_header->bits    = block_header->bits | exponent << 24;
