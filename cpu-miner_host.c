@@ -1,6 +1,5 @@
 #include "sha-256.h"
 #include <stdio.h>
-
 int main(void) {
     srand(time(NULL));
     blockHeader bh;

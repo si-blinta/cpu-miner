@@ -374,7 +374,8 @@ int compare_hashes(const uint8_t *hash1, const uint8_t *hash2, size_t size) {
 }
 uint32_t scan_hash_test(blockHeader bh, uint32_t nonceMax) {
     uint32_t hash_count = 0;
-    clock_t start = clock(); // timer start
+    time_t start ; time(&start);
+	double hashes_per_second;
     uint8_t hash[SIZE_OF_SHA_256_HASH];
     uint8_t target[SIZE_OF_SHA_256_HASH];
     calculate_target_from_bits(bh.bits,target);
@@ -403,8 +404,7 @@ uint32_t scan_hash_test(blockHeader bh, uint32_t nonceMax) {
         hash_count++;
 
         if (compare_hashes(hash, target, SIZE_OF_SHA_256_HASH) < 0) {
-            clock_t end = clock();
-            double hashes_per_second = hash_count/((double)(end-start)/CLOCKS_PER_SEC);
+            hashes_per_second = (double)hash_count / difftime(time(NULL),start);
             // Found a hash less than the target
             printf("Big endian :Hash\n");
             for(int i = SIZE_OF_SHA_256_HASH-1; i >=0; i--) {
@@ -420,8 +420,7 @@ uint32_t scan_hash_test(blockHeader bh, uint32_t nonceMax) {
             return nonce; // Return true if a valid hash is found
         }
     }
-    clock_t end = clock();
-    double hashes_per_second = hash_count/((double)(end-start)/CLOCKS_PER_SEC);
+    hashes_per_second = (double)hash_count / difftime(time(NULL), start);
     printf("Failure! Hash not found :\n");
 	printf("hashes per second = %f\n",hashes_per_second);
     return -1; // Return false if no valid hash is found within nonce range
