@@ -1,22 +1,18 @@
-Step 1:
-On upmem pim :
-    - Create a block ( with low difficulty)
-    - Send it to a single DPU
-    - Retrieve the Nonce
-    - Benchmarking
-Step 2:
-On normal architecture:
-    -Implement multithreading
+Step 1: Deadline Tuesday 5 mars DONE
+    - Create a block ( with low difficulty) OK
+    - Send it to a single DPU OK
+    - Retrieve the Nonce OK 
+    - Benchmarking OK , Very consistent 443.8 . 
+BUG : However, whatever your choice is, you have to carefully manage counter overflows, since the hardware counter is 36-bit wide. Also, 
+remember that the counter precision is 16 cycles (or instructions). MANAGE COUNTER OVERFLOWS
+//TODO create mining context , manage communication between host and dpu using the structure
 
-Step 3:
-On upmem pim :
+Step 2: Deadline Thursday 7 mars
     -Use many DPUS
     -Retrieve the right result
     -Finish other DPUs
     -Benchmarking
-
 Step 4:
-On upmem pim :
     -Use tasklets
     -Benchmarking
 Step 5:

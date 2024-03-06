@@ -1,15 +1,14 @@
-CFLAGS = -O3 -Wall -std=c99
+HOST-CC           = gcc
+HOST-CFLAGS       = -std=c99
+HOST-LIBS         = `dpu-pkg-config --cflags --libs dpu`
+DPU-CC            = dpu-upmem-dpurte-clang
 
-test: test.o sha-256.o
+all: clean dpu-miner host-miner
 
-test.o: sha-256.h test.c
+dpu-miner: src/dpu-miner.c include/sha-256.c include/blockHeader.c
+	$(DPU-CC) -DDPU -o bin/dpu-miner src/dpu-miner.c include/sha-256.c include/blockHeader.c
+host-miner: src/host-miner.c include/sha-256.c include/blockHeader.c
+	$(HOST-CC) $(HOST-CFLAGS) -DHOST src/host-miner.c include/sha-256.c include/blockHeader.c -o bin/host-miner $(HOST-LIBS)
 
-sha-256.o: sha-256.h sha-256.c
-
-.PHONY: all
-all: test
-	./test
-
-.PHONY: clean
 clean:
-	rm -f test *.o
+	rm -f bin/host-miner bin/dpu-miner

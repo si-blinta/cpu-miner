@@ -3,7 +3,11 @@
         "assert.h": "c",
         "stdio.h": "c",
         "stdint.h": "c",
-        "block_header.h": "c"
+        "block_header.h": "c",
+        "sha-256-dpu.h": "c",
+        "stdlib.h": "c",
+        "sha-256.h": "c",
+        "blockheader.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
