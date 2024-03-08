@@ -3,20 +3,11 @@
 #include <defs.h>
 #include <barrier.h>
 #include "mutex.h"
-
-BARRIER_INIT(my_barrier, NR_TASKLETS);
+BARRIER_INIT(my_barrier,NR_TASKLETS);
 MUTEX_INIT(my_mutex);
 
-/**
- * Questions : how can i stop the execution of all tasklet once one finished ?
-*/
-
-/**
- * MRAM variable : maybe i use WRAM instead since target = 32 bytes and blockheader = 80 bytes.
- * In upmem guide they suggest to put 10 -> 100 bytes variables in WRAM
-*/
-__mram_noinit uint8_t target[SIZE_OF_SHA_256_HASH]; 
-__mram_noinit blockHeader bh;
+//Global variable to stop tasklets.
+extern uint8_t finish;
 
 /**
  * Wram host varaibles
@@ -24,7 +15,8 @@ __mram_noinit blockHeader bh;
 __host uint32_t  dpu_nonce;
 __host uint32_t  dpu_id;    // HOST -> WRAM 4 bytes aligned : todo improve ( maybe send other information with same variable ...)
 __host uint32_t  dpu_nb;
-
+__host uint8_t dpu_target[SIZE_OF_SHA_256_HASH];
+__host blockHeader dpu_block_header;
 /**
  * Improvements : 
  *              - Stop all tasklets when a golden nonce is found. ( Notify the host or someting ).
@@ -40,29 +32,12 @@ int main(void) {
     uint32_t tasklet_start = dpu_start + tasklet_id*tasklet_range ;
     uint32_t tasklet_end   = dpu_start + (tasklet_id+1) *  tasklet_range ;
     uint32_t tasklet_nonce;  
-    
-    //start mram_read
-    __dma_aligned uint8_t dpu_target_hash[SIZE_OF_SHA_256_HASH];
-    mram_read(&target,&dpu_target_hash,SIZE_OF_SHA_256_HASH);
-    __dma_aligned blockHeader dpu_block_header;
-    mram_read(&bh,&dpu_block_header,sizeof(bh));
-    //end mram_read
-
-    printf("Tasklet %d : start = %u | end = %u \n",tasklet_id,tasklet_start,tasklet_end);
-    tasklet_nonce = scan_hash(dpu_block_header,dpu_target_hash,tasklet_start,tasklet_end-1);
-    
-    /**
-     * We will remove barrier its just slowing the program, we just use it to debug now
-    */
-
-    barrier_wait(&my_barrier);  // wait all tasklets to finish before printing results ( Debug purposes).
-    printf("Tasklet %d : nonce = %08x, Stack ressources available : %u : dpu id = %d\n",tasklet_id,tasklet_nonce, check_stack(),dpu_id);
-    
+    tasklet_nonce = scan_hash(dpu_block_header,dpu_target,tasklet_start,tasklet_end-1);
     if(tasklet_nonce != UINT32_MAX){ // update dpu_nonce only if we have a valid tasklet_nonce.
         mutex_lock(my_mutex);
+        finish = 1;                  // Interrupt other tasklets.
         dpu_nonce = tasklet_nonce;
         mutex_unlock(my_mutex);
-        // Interrupt other tasklets. ( maybe send something to the host to stop other dpus also ).
     }
     return 0;
 }

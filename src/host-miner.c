@@ -32,7 +32,7 @@ int main(void) {
    * Allocating DPUS
   */
   struct dpu_set_t set, dpu;
-  DPU_ASSERT(dpu_alloc(5, NULL, &set));
+  DPU_ASSERT(dpu_alloc(10, NULL, &set));
   DPU_ASSERT(dpu_load(set, DPU_BINARY, NULL));
   DPU_ASSERT(dpu_get_nr_dpus(set,&nb_dpus));
   printf("ALLOCATED : %d DPUs \n",nb_dpus);
@@ -46,8 +46,8 @@ int main(void) {
    * Broadcasting the blockHeader , the target hash and number of dpus allocated to all DPUs
   */
 
-  DPU_ASSERT(dpu_broadcast_to(set, "bh", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
-  DPU_ASSERT(dpu_broadcast_to(set, "target", 0,&target,sizeof(target), DPU_XFER_DEFAULT));
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_block_header", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,&target,sizeof(target), DPU_XFER_DEFAULT));
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
   /**
    * Sending IDs to each DPU.
@@ -67,7 +67,6 @@ int main(void) {
   */
 
   DPU_FOREACH(set, dpu) {
-      DPU_ASSERT(dpu_log_read(dpu,stdout));
       DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));
       printf("---------RECEIVED---------\n");
       printf("|        %08x        |\n",golden_nonce);
