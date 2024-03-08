@@ -114,12 +114,12 @@ void calculate_target_from_bits(uint32_t bits, uint8_t target[SIZE_OF_SHA_256_HA
 		//Shift to the left by 8 * ( exponent - 3) = multiplying by 256^( exponent -3 )
 		memmove(target + shift, target, SIZE_OF_SHA_256_HASH - shift);
 		//Set the rest to 0xff
-		memset(target,0xff,shift);
+		memset(target,0xff,shift);  // not sure if 00 or ff ? logically ff
 	}
 	else if ( shift < 0 ){
 		//Shift to the right by 8 * ( -exponent + 3) = dividing by 256^( -exponent +3 )
 		memmove(target, target - shift, SIZE_OF_SHA_256_HASH + shift);
-		//Set the rest to 0xff
+		//Set the rest to 0xff // not sure if 00 or ff ? logically ff
 		memset(target + shift, 0xff, -shift);
 	}
 	//Do nothing if shift = 0. because we multiply by 256^0 which is 1.
