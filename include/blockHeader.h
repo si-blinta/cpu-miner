@@ -98,7 +98,7 @@ int compare_hashes(const uint8_t *hash1, const uint8_t *hash2, size_t size);
  * @param target The target hash.
  * @param nonce_start The first nonce value to be tested. 
  * @param nonce_end The maximum nonce value to be tested.
- * @return The nonce value that satisfies the condition, or -1 if not found.
+ * @return The nonce value that satisfies the condition, or 0xffffffff if not found.
  */
 uint32_t scan_hash_test(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end);
 
@@ -108,7 +108,7 @@ uint32_t scan_hash_test(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uin
  * @param target The target hash.
  * @param nonce_start The first nonce value to be tested. 
  * @param nonce_end The maximum nonce value to be tested.
- * @return The nonce value that satisfies the condition, or -1 if not found.
+ * @return The nonce value that satisfies the condition, or 0xffffffff if not found.
  */
 uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end);
 
