@@ -75,7 +75,7 @@ int main(void) {
  *      -step 3:
  *          - if tasklet_nonce is valid :
  *              - end all tasklets.
- *              - notify host.
+ *              - notify host ? .
 */
 
 /**
@@ -92,4 +92,3 @@ int main(void) {
  *          - Use one tasklet , for example tasklet 0, to compute the sum of all hash_rate.
  *          - Fill the variable dpu_hash_rate with the sum. ( the host will take it from here )
 */
-

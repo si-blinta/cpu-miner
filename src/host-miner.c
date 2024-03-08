@@ -2,7 +2,6 @@
 #include <dpu.h>
 #include <dpu_log.h>
 #include <stdio.h>
-
 #include "../include/blockHeader.h"
 #ifndef DPU_BINARY
 #define DPU_BINARY "bin/dpu-miner"

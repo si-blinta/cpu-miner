@@ -2,7 +2,7 @@ Step 1:
     - Create a block ( with low difficulty) OK
     - Send it to a single DPU OK
     - Retrieve the Nonce OK 
-    - Benchmarking OK , Very consistent 443.8 . 
+    - Benchmarking OK , Very consistent 443.8 .
     - Use tasklets OK
     - Benchmark tasklets TODO
     - Terminate tasklets when we got a golden nonce TODO
