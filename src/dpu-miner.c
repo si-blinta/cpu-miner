@@ -3,7 +3,6 @@
 #include <defs.h>
 #include <barrier.h>
 #include "mutex.h"
-BARRIER_INIT(my_barrier,NR_TASKLETS);
 MUTEX_INIT(my_mutex);
 
 //Global variable to stop tasklets.
@@ -12,7 +11,7 @@ extern uint8_t finish;
 /**
  * Wram host varaibles
  * */ 
-__host uint32_t  dpu_nonce;
+__host uint32_t  dpu_nonce = UINT32_MAX;
 __host uint32_t  dpu_id;    // HOST -> WRAM 4 bytes aligned : todo improve ( maybe send other information with same variable ...)
 __host uint32_t  dpu_nb;
 __host uint8_t dpu_target[SIZE_OF_SHA_256_HASH];
@@ -41,18 +40,6 @@ int main(void) {
     }
     return 0;
 }
-/**
- * Final Program : 
- *      -step 1:
- *          -mram read all the variables needed.
- *      -step 2:
- *          -scan_hash()
- *      -step 3:
- *          - if tasklet_nonce is valid :
- *              - end all tasklets.
- *              - notify host ? .
-*/
-
 /**
  * Performance Test program : 
  *      -step 1:

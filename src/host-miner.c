@@ -7,13 +7,6 @@
 #define DPU_BINARY "bin/dpu-miner"
 #endif
 
-/**
- * Questions:
- *          - How can i interrupt Dpus.
- *          - How can i reset the ressources in DPUS. ( is it needed in our case ? ) 
- *          - How can i wait for one dpu to end.      ( multi threading ? )
-*/
-
 void HOST_TOOLS_send_id(struct dpu_set_t set){
   struct dpu_set_t dpu;
   uint32_t id = 0;
@@ -54,39 +47,28 @@ int main(void) {
   */
   HOST_TOOLS_send_id(set);
   /**
-   * Launching in Synchronous way (Blocking host till DPUs finish executing)
-   * To modify, wait till a single DPU with a golden nonce and terminate if possible other DPUS.
+   * Launching in Synchronous way.
   */
-
   DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
-  /**
-   * Copying nonces :
-   * Here again i need to check if its a valid nonce and break if possible.
-   * Now i just copy the result if my nonce is not valid.
-   * So basically i wait for all dpus to finish which is very useless.
-  */
-
+ 
   DPU_FOREACH(set, dpu) {
+      DPU_ASSERT(dpu_log_read(dpu,stdout));
       DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));
-      printf("---------RECEIVED---------\n");
-      printf("|        %08x        |\n",golden_nonce);
-      printf("--------------------------\n");
+      if(golden_nonce != UINT32_MAX ){
+        bh.nonce = golden_nonce;
+        printf("--------------------------MINED A BLOCK--------------------------\n");
+        /*print_block_header(bh);
+        printf("little endian = %08x\n",to_little_endian_32(golden_nonce));
+        printf("big endian = %08x\n",golden_nonce);
+        break;*/
+      }
+      
   }
   DPU_ASSERT(dpu_free(set));
-    
-  /**
-   * Printing block Header informations if we succeded ( for debug purposes).
-  */
 
-  if(golden_nonce != UINT32_MAX ){
-    bh.nonce = golden_nonce;
-    printf("Success\n");
-    print_block_header(bh);
-    printf("little endian = %08x\n",to_little_endian_32(golden_nonce));
-    printf("big endian = %08x\n",golden_nonce);
+  if(golden_nonce == UINT32_MAX ){
+    printf("--------------------------FAILED--------------------------\n"); 
   }
-  else 
-    printf("FAILED\n");
 }
 
 /**

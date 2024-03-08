@@ -24,7 +24,7 @@ void generate_block_header(blockHeader *block_header) {
     // Correctly generate random values for integers
     block_header->version = (uint32_t)rand(); 			    // Random version
     block_header->time 	  = (uint32_t)time(NULL); 		    // Current time
-    block_header->bits    = rand() %0x7fffff +0x008000 ;    // Mantissa maximum legal value = 0x7fffff,
+    block_header->bits    = 0xffffff;//rand() %0x7fffff +0x008000 ;    // Mantissa maximum legal value = 0x7fffff,
 															// 0x008000 is the smallest legal   source : https://wiki.bitcoinsv.io/index.php/Difficulty 
 	uint8_t r             = rand() % 6 + 50;				// We limit the randomness of exponent because it may take infinite time with my potato pc 
 	uint32_t exponent     = TRAILING_ZEROS(56);				// this macro will make sure to have 50 to 56 trailing zeros so the target will start with
@@ -162,6 +162,7 @@ uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t
     char concatenated_header[CONCAT_LENGTH];
     for (uint32_t nonce = bh.nonce + nonce_start ; nonce < nonce_end; nonce++) {
         if(finish == 1){
+            printf("finished because of variable\n");
             return UINT32_MAX;
         } 
         bh.nonce = nonce; // Update nonce in block header
