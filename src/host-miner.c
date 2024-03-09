@@ -1,11 +1,9 @@
-#include <assert.h>
-#include <dpu.h>
-#include <dpu_log.h>
-#include <stdio.h>
 #include "../include/blockHeader.h"
+#include "../include/hostTools.h"
 #ifndef DPU_BINARY
 #define DPU_BINARY "bin/dpu-miner"
 #endif
+
 
 /**
  * Questions:
@@ -14,38 +12,38 @@
  *          - How can i wait for one dpu to end.      ( multi threading ? )
 */
 
-void HOST_TOOLS_send_id(struct dpu_set_t set){
-  struct dpu_set_t dpu;
-  uint32_t id = 0;
-  DPU_FOREACH(set,dpu,id){
-      DPU_ASSERT(dpu_copy_to(dpu, "dpu_id", 0,&id,sizeof(uint32_t)));
-  }
-}
 
-int main(void) {
+
+int main(int argc, char** argv) {
   srand(time(NULL));
+  if(argc < 3){
+    fprintf(stderr,"Usage : %s [nb_dpus] [nb_tasklets]\n",argv[0]);
+    fprintf(stdout,"0 if you want to allocate all available DPUs\n");
+    exit(EXIT_FAILURE);
+  }
+  if(atoi(argv[2]) <= 0 ||  atoi(argv[2]) > 24 || atoi(argv[1]) < 0 || atoi(argv[1]) > 1280){
+    fprintf(stderr,"1 <= nb_tasklets <= 24  0 <= nb_dpus <= 1280 \n");
+    exit(EXIT_FAILURE);
+  }
+  uint32_t nb_dpus     = atoi(argv[1]);
+  uint8_t  nb_tasklets = atoi(argv[2]);
+  if(  nb_dpus == 0 )
+    nb_dpus = DPU_ALLOCATE_ALL;
+  struct dpu_set_t set, dpu;
+  HOST_TOOLS_allocate_dpus(&set,&nb_dpus);
+  HOST_TOOLS_compile(nb_tasklets);
+  DPU_ASSERT(dpu_load(set,DPU_BINARY,NULL));
+  
   uint32_t golden_nonce = UINT32_MAX; // initialize it as unvalid nonce
   blockHeader bh;
   uint8_t target[SIZE_OF_SHA_256_HASH];
-  uint32_t nb_dpus = 0;
-  /**
-   * Allocating DPUS
-  */
-  struct dpu_set_t set, dpu;
-  DPU_ASSERT(dpu_alloc(5, NULL, &set));
-  DPU_ASSERT(dpu_load(set, DPU_BINARY, NULL));
-  DPU_ASSERT(dpu_get_nr_dpus(set,&nb_dpus));
-  printf("ALLOCATED : %d DPUs \n",nb_dpus);
-
   //Generating block header and calculating target hash
   generate_block_header(&bh);                 
   calculate_target_from_bits(bh.bits,target); 
   print_256_bits_integer(target,"Target Hash");
-
   /**
    * Broadcasting the blockHeader , the target hash and number of dpus allocated to all DPUs
   */
-
   DPU_ASSERT(dpu_broadcast_to(set, "bh", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
   DPU_ASSERT(dpu_broadcast_to(set, "target", 0,&target,sizeof(target), DPU_XFER_DEFAULT));
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
@@ -57,7 +55,6 @@ int main(void) {
    * Launching in Synchronous way (Blocking host till DPUs finish executing)
    * To modify, wait till a single DPU with a golden nonce and terminate if possible other DPUS.
   */
-
   DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
   /**
    * Copying nonces :
@@ -65,7 +62,6 @@ int main(void) {
    * Now i just copy the result if my nonce is not valid.
    * So basically i wait for all dpus to finish which is very useless.
   */
-
   DPU_FOREACH(set, dpu) {
       DPU_ASSERT(dpu_log_read(dpu,stdout));
       DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));
@@ -123,4 +119,3 @@ int main(void) {
  *         -Compute the sum of all dpu_hash_rate in total_hash_rate.
  *         -Print results.
 */
-
