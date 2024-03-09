@@ -8,7 +8,9 @@
         "stdlib.h": "c",
         "sha-256.h": "c",
         "blockheader.h": "c",
-        "dpu.h": "c"
+        "dpu.h": "c",
+        "host_tools.h": "c",
+        "dpu_log.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
