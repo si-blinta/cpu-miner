@@ -6,7 +6,6 @@
 #ifndef DPU_BINARY
 #define DPU_BINARY "bin/dpu-miner"
 #endif
-
 void HOST_TOOLS_send_id(struct dpu_set_t set){
   struct dpu_set_t dpu;
   uint32_t id = 0;
@@ -42,6 +41,7 @@ int main(void) {
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_block_header", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,&target,sizeof(target), DPU_XFER_DEFAULT));
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_nonce", 0,&golden_nonce,sizeof(golden_nonce), DPU_XFER_DEFAULT));
   /**
    * Sending IDs to each DPU.
   */
@@ -50,17 +50,17 @@ int main(void) {
    * Launching in Synchronous way.
   */
   DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
+  
  
   DPU_FOREACH(set, dpu) {
-      DPU_ASSERT(dpu_log_read(dpu,stdout));
       DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));
       if(golden_nonce != UINT32_MAX ){
         bh.nonce = golden_nonce;
         printf("--------------------------MINED A BLOCK--------------------------\n");
-        /*print_block_header(bh);
+        print_block_header(bh);
         printf("little endian = %08x\n",to_little_endian_32(golden_nonce));
         printf("big endian = %08x\n",golden_nonce);
-        break;*/
+        break;
       }
       
   }

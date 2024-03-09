@@ -11,11 +11,12 @@ extern uint8_t finish;
 /**
  * Wram host varaibles
  * */ 
-__host uint32_t  dpu_nonce = UINT32_MAX;
+__host uint32_t  dpu_nonce;
 __host uint32_t  dpu_id;    // HOST -> WRAM 4 bytes aligned : todo improve ( maybe send other information with same variable ...)
 __host uint32_t  dpu_nb;
 __host uint8_t dpu_target[SIZE_OF_SHA_256_HASH];
 __host blockHeader dpu_block_header;
+
 /**
  * Improvements : 
  *              - Stop all tasklets when a golden nonce is found. ( Notify the host or someting ).

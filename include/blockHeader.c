@@ -161,10 +161,9 @@ uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t
     uint8_t hash[SIZE_OF_SHA_256_HASH];
     char concatenated_header[CONCAT_LENGTH];
     for (uint32_t nonce = bh.nonce + nonce_start ; nonce < nonce_end; nonce++) {
-        if(finish == 1){
-            printf("finished because of variable\n");
+        if(finish != 0){
             return UINT32_MAX;
-        } 
+        }
         bh.nonce = nonce; // Update nonce in block header
         concat_block_header(bh,concatenated_header);
         calc_sha_256(hash, concatenated_header, strlen(concatenated_header));
