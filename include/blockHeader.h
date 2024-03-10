@@ -20,12 +20,6 @@ typedef struct {
     uint32_t nonce;                 // Counter used for proof-of-work algorithm
 } blockHeader;
 
-typedef struct{
-  uint32_t nonce_start;
-  uint32_t nonce_end  ;
-  uint8_t  target[SIZE_OF_SHA_256_HASH];
-  blockHeader bh;
-}mining_context;
 
 /**
  * @brief Transform a 4 byte int to little endian.
