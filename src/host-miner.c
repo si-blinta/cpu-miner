@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
   /**
    * Broadcasting the blockHeader , the target hash and number of dpus allocated to all DPUs
   */
-  DPU_ASSERT(dpu_broadcast_to(set, "bh", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
-  DPU_ASSERT(dpu_broadcast_to(set, "target", 0,&target,sizeof(target), DPU_XFER_DEFAULT));
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_block_header", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,&target,sizeof(target), DPU_XFER_DEFAULT));
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_nonce", 0,&golden_nonce,sizeof(golden_nonce), DPU_XFER_DEFAULT));
   /**
