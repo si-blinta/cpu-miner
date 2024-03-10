@@ -16,5 +16,4 @@ void HOST_TOOLS_compile(uint8_t nb_tasklets){
     char command[100];
     sprintf(command,"make dpu-miner NB_TASKLETS=%d", nb_tasklets);
     system(command);
-    printf("Compiled dpu program with %u tasklets\n",nb_tasklets);
 }

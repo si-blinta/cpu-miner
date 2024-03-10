@@ -92,18 +92,18 @@ void calculate_target_from_bits(uint32_t bits, uint8_t target[SIZE_OF_SHA_256_HA
 int compare_hashes(const uint8_t *hash1, const uint8_t *hash2, size_t size);
 
 /**
- * @brief test hashing performance by finding a hash less than a target
- * within a given nonce range and measuring the speed of hashes per second.
+ * @brief test hashing performance by doing the same operations as if we
+ * want to mine a block. The function returns only if the nonce_end is reached.
  * @param bh The block header for the hashing test.
  * @param target The target hash.
  * @param nonce_start The first nonce value to be tested. 
  * @param nonce_end The maximum nonce value to be tested.
- * @return The nonce value that satisfies the condition, or 0xffffffff if not found.
+ * @return The number of hashes done by a tasklet.
  */
 uint32_t scan_hash_test(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end);
 
 /**
- * @brief mining function , same as scan_hash_test but without any logs, performance test
+ * @brief Mining function, trying a new nonce in every iteration to find the target hash.
  * @param bh The block header for the hashing test.
  * @param target The target hash.
  * @param nonce_start The first nonce value to be tested. 

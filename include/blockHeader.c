@@ -134,28 +134,20 @@ int compare_hashes(const uint8_t *hash1, const uint8_t *hash2, size_t size) {
 }
 #ifdef DPU
 uint32_t scan_hash_test(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end) {
-    perfcounter_config (COUNT_CYCLES , true);
-    uint32_t hash_count = 0;
-    uint32_t cycles     = 0;
+    // Here we have the same operations as the scan_hash test to ensure precise tests.
+    uint32_t tasklet_hashes_done = 0;
     uint8_t hash[SIZE_OF_SHA_256_HASH];
     char concatenated_header[CONCAT_LENGTH];
-    for (uint32_t nonce = bh.nonce + nonce_start ; nonce <= nonce_end; nonce++) {
-        bh.nonce = nonce; // Update nonce in block header
-        concat_block_header(bh,concatenated_header);
-        calc_sha_256(hash, concatenated_header, strlen(concatenated_header));
-        calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
-        hash_count++;
-        if (compare_hashes(hash, target, SIZE_OF_SHA_256_HASH) < 0) {
-            cycles = perfcounter_get();
-            printf("Did %d Hashes in %lf seconds => Hash rate = %lf\n",hash_count,(double) cycles / CLOCKS_PER_SEC,(double) hash_count / ( (double) cycles / CLOCKS_PER_SEC));
-            print_256_bits_integer(hash,"hash");
-            return nonce; 
+    for (uint32_t nonce = nonce_start ; nonce <= nonce_end; nonce++) {
+        bh.nonce = nonce; // Update nonce in block header // op1
+        concat_block_header(bh,concatenated_header);      // op2
+        calc_sha_256(hash, concatenated_header, strlen(concatenated_header)); // op3
+        calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);                         // op4
+        tasklet_hashes_done++;                                                // op5
+        if (compare_hashes(hash, target, SIZE_OF_SHA_256_HASH) < 0) {         //op6
         }
     }
-    printf("Failure! Hash not found :\n");
-	cycles = perfcounter_get();
-    printf("Did %d Hashes in %lf seconds => Hash rate = %lf\n",hash_count,(double) cycles / CLOCKS_PER_SEC,(double) hash_count / ( (double) cycles / CLOCKS_PER_SEC));
-    return UINT32_MAX; // Return false if no valid hash is found within nonce range
+    return tasklet_hashes_done;
 }
 uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end) {
     uint8_t hash[SIZE_OF_SHA_256_HASH];
