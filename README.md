@@ -2,4 +2,4 @@ FROM BITCOIN-SAE FOLDER :
 COMPILATION : 
     make all
 Run host    :
-    ./run
+    bin/host-dpu [nb_dpus] [nb_tasklets]
