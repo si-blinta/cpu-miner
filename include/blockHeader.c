@@ -31,7 +31,7 @@ void generate_block_header(blockHeader *block_header) {
 															// at least (64-56-4) 4 zeros. 64 = nb bytes of sha256 hash, 56 = nb bytes as trailing zeros
 															// 4 = minimum of bytes as leading zeros that a mantissa can have (0x008000 is the smallest legal).
 	block_header->bits    = block_header->bits | exponent << 24;
-	block_header->nonce   = (uint32_t)rand(); 				// Random nonce
+	block_header->nonce   = 0 ;
 
     for (int i = 0; i < sizeof(block_header->previous_hash); i++) {
         block_header->previous_hash[i] = (uint8_t)(rand() % 256);
