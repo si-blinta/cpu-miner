@@ -138,7 +138,7 @@ uint32_t scan_hash_test(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uin
     uint32_t tasklet_hashes_done = 0;
     uint8_t hash[SIZE_OF_SHA_256_HASH];
     char concatenated_header[CONCAT_LENGTH];
-    for (uint32_t nonce = nonce_start ; nonce <= nonce_end; nonce++) {
+    for (uint32_t nonce = bh.nonce + nonce_start ; nonce <= nonce_end; nonce++) {
         bh.nonce = nonce; // Update nonce in block header // op1
         concat_block_header(bh,concatenated_header);      // op2
         calc_sha_256(hash, concatenated_header, strlen(concatenated_header)); // op3
