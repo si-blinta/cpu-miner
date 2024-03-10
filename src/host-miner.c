@@ -2,7 +2,7 @@
 #include "../include/hostTools.h"
 #include <time.h>
 #define TASKLET_TEST_PATH "csv/hashrate_tasklets.csv"
-#define DPU_TEST_PATH     "csv/hashrate_dpus.csv"
+#define DPU_TEST_PATH     "csv/hashrate_dpus1.csv"
 #ifndef DPU_BINARY
 #define DPU_BINARY "bin/dpu-miner"
 #endif
@@ -66,7 +66,8 @@ int main(int argc, char** argv) {
   duration = difftime(end,start);
   printf("Did %u hashes in %lf seconds  => Hashrate = %lf\n",nb_hashes,duration, (double) nb_hashes/duration);
   FILE* performance_file = fopen(DPU_TEST_PATH,"a+");
-  fprintf(performance_file,"%d;%lf\n",nb_tasklets,(double) nb_hashes/duration);
+  //fprintf(performance_file,"%d;%lf\n",nb_tasklets,(double) nb_hashes/duration); //for taskelts
+  fprintf(performance_file,"%d;%lf\n",nb_dpus,(double) nb_hashes/duration);  // for dpus
   fclose(performance_file);
   DPU_ASSERT(dpu_free(set));
 }
