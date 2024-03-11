@@ -5,11 +5,11 @@
 #endif
 
 
+
 /**
  * Questions:
  *          - How can i interrupt Dpus.
- *          - How can i reset the ressources in DPUS. ( is it needed in our case ? ) 
- *          - How can i wait for one dpu to end.      ( multi threading ? )
+ *          - I found how to check if a dpu had finished : dpu_poll_dpu(dpu.dpu,&running,&fault), include low level library <dpu_runner.h>
 */
 
 
