@@ -3,6 +3,7 @@
 #include "sha-256.h"
 #ifdef HOST
 #include <time.h>
+//#include <curl/curl.h>
 #endif //HOST
 #ifdef DPU
 #include <perfcounter.h>
@@ -105,6 +106,14 @@ uint32_t scan_hash_test(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uin
  * @return The nonce value that satisfies the condition, or 0xffffffff if not found.
  */
 uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end);
+
+/**
+ *@brief This function will test if out double sha256 is working fine.By comparing the results
+ *       with the results on this website : https://emn178.github.io/online-tools/double_sha256
+ * @param input The String to hash.
+*/
+
+int unit_test_double_sha256(char* input);
 
 
 #endif //BLOCK_HEADER_H
