@@ -10,6 +10,7 @@
  * Questions:
  *          - How can i interrupt Dpus.
  *          - I found how to check if a dpu had finished : dpu_poll_dpu(dpu.dpu,&running,&fault), include low level library <dpu_runner.h>
+ *           (idea : maybe use a tasklet checking for a host_variable changing if so , alert other tasklets)
 */
 
 
