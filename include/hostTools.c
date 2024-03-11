@@ -17,3 +17,68 @@ void HOST_TOOLS_compile(uint8_t nb_tasklets){
     sprintf(command,"make dpu-miner NB_TASKLETS=%d", nb_tasklets);
     system(command);
 }
+
+static void HOST_TOOLS_test(uint32_t nb_dpus_p, uint32_t nb_tasklets_p, uint32_t nb_hashes_p, uint8_t type, char* path){
+  FILE* performance_file = fopen(path,"a+");
+  if(performance_file == NULL){
+    perror("[fopen]\n");
+    exit (EXIT_FAILURE);
+  }
+  uint32_t nb_dpus     = nb_dpus_p;
+  uint32_t nb_tasklets = nb_tasklets_p;
+  uint32_t nb_hashes   = nb_hashes_p;
+  struct dpu_set_t set, dpu;
+  HOST_TOOLS_allocate_dpus(&set,&nb_dpus);
+  HOST_TOOLS_compile(nb_tasklets);
+  DPU_ASSERT(dpu_load(set,DPU_BINARY,NULL));
+  
+  blockHeader bh;
+  uint8_t target[SIZE_OF_SHA_256_HASH];
+  
+  //Generating block header and calculating target hash
+  generate_block_header(&bh);                 
+  calculate_target_from_bits(bh.bits,target); 
+  /**
+   * Broadcasting the blockHeader , the target hash and number of dpus allocated to all DPUs
+  */
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_block_header", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,&target,sizeof(target), DPU_XFER_DEFAULT));
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb_hashes", 0,&nb_hashes,sizeof(nb_hashes), DPU_XFER_DEFAULT));
+  /**
+   * Sending IDs to each DPU.
+  */
+  HOST_TOOLS_send_id(set);
+  /**
+   * Launching in Synchronous way.
+  */
+  clock_t start,end;
+  double duration;
+  start = clock();
+  DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
+  end = clock();
+  duration = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("Did %u hashes in %lf seconds  => Hashrate = %lf\n",nb_hashes,duration, (double) nb_hashes/duration);
+  if(type == DPU_TEST){  
+    fprintf(performance_file,"%d;%lf\n",nb_dpus,(double) nb_hashes/duration);  // for dpus
+  }
+  else{
+    fprintf(performance_file,"%d;%lf\n",nb_tasklets,(double) nb_hashes/duration);  // for dpus
+  }
+  fclose(performance_file);
+  DPU_ASSERT(dpu_free(set));
+}
+
+void HOST_TOOLS_dpu_test(char* path){
+  printf("starting test for dpu\n");
+  for(int i = 50; i < 1150; i+=50){
+      HOST_TOOLS_test(i,10,10000*i,DPU_TEST,path);
+    }
+}
+
+void HOST_TOOLS_tasklet_test(char* path){
+  printf("starting test for tasklets\n");
+  for(int i = 1; i < 25; i++){
+    HOST_TOOLS_test(1,i,1000*i,TASKLET_TEST,path);
+  }
+}
