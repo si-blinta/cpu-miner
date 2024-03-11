@@ -72,8 +72,9 @@ static void HOST_TOOLS_test(uint32_t nb_dpus_p, uint32_t nb_tasklets_p, uint32_t
 void HOST_TOOLS_dpu_test(char* path){
   printf("starting test for dpu\n");
   for(int i = 50; i < 1150; i+=50){
-      HOST_TOOLS_test(i,10,10000*i,DPU_TEST,path);
-    }
+      HOST_TOOLS_test(i,11,10000*i,DPU_TEST,path);
+  }
+  HOST_TOOLS_test(DPU_ALLOCATE_ALL,11,10000*1000,DPU_TEST,path);
 }
 
 void HOST_TOOLS_tasklet_test(char* path){
