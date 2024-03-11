@@ -168,6 +168,6 @@ uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t
     return UINT32_MAX; // Return 0xffffffff if no valid hash is found within nonce range
 }
 int unit_test_double_sha256(char* input){
-  
+  return 0;
 }
 #endif //DPU
