@@ -58,11 +58,11 @@ static void HOST_TOOLS_test(uint32_t nb_dpus_p, uint32_t nb_tasklets_p, uint32_t
   DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
   end = clock();
   duration = ((double) (end - start)) / CLOCKS_PER_SEC;
-  printf("Did %u hashes in %lf seconds  => Hashrate = %lf\n",nb_hashes,duration, (double) nb_hashes/duration);
-  if(type == DPU_TEST){  
+  printf("Did %u solutions in %lf seconds  => Sol/s = %lf\n",nb_hashes,duration, (double) nb_hashes/duration);
+  if(type == DPU_SOL_TEST){  
     fprintf(performance_file,"%d;%lf\n",nb_dpus,(double) nb_hashes/duration);  // for dpus
   }
-  else{
+  else if(type == TASKLET_SOL_TEST){
     fprintf(performance_file,"%d;%lf\n",nb_tasklets,(double) nb_hashes/duration);  // for dpus
   }
   fclose(performance_file);
@@ -72,7 +72,7 @@ static void HOST_TOOLS_test(uint32_t nb_dpus_p, uint32_t nb_tasklets_p, uint32_t
 void HOST_TOOLS_dpu_test(char* path){
   printf("starting test for dpu\n");
   for(int i = 50; i < 1150; i+=50){
-      HOST_TOOLS_test(i,11,10000*i,DPU_TEST,path);
+      HOST_TOOLS_test(i,11,10000*i,DPU_SOL_TEST,path);
   }
   HOST_TOOLS_test(DPU_ALLOCATE_ALL,11,10000*1000,DPU_TEST,path);
 }
@@ -80,6 +80,6 @@ void HOST_TOOLS_dpu_test(char* path){
 void HOST_TOOLS_tasklet_test(char* path){
   printf("starting test for tasklets\n");
   for(int i = 1; i < 25; i++){
-    HOST_TOOLS_test(1,i,1000*i,TASKLET_TEST,path);
+    HOST_TOOLS_test(1,i,1000*i,TASKLET_SOL_TEST,path);
   }
 }
