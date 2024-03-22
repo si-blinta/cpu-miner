@@ -36,50 +36,27 @@ int main(int argc, char** argv) {
   DPU_ASSERT(dpu_load(set,DPU_BINARY,NULL));
   
   uint32_t golden_nonce = UINT32_MAX; // initialize it as unvalid nonce
+  uint32_t nb_boot      = 2;
   blockHeader bh;
   uint8_t target[SIZE_OF_SHA_256_HASH];
   //Generating block header and calculating target hash
   generate_block_header(&bh);                 
   calculate_target_from_bits(bh.bits,target); 
   print_256_bits_integer(target,"Target Hash");
-  /**
-   * Broadcasting the blockHeader , the target hash and number of dpus allocated to all DPUs
-  */
-  DPU_ASSERT(dpu_broadcast_to(set, "dpu_block_header", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
-  DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,&target,sizeof(target), DPU_XFER_DEFAULT));
-  DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
-  DPU_ASSERT(dpu_broadcast_to(set, "dpu_nonce", 0,&golden_nonce,sizeof(golden_nonce), DPU_XFER_DEFAULT));
-  /**
-   * Sending IDs to each DPU.
-  */
-  HOST_TOOLS_send_id(set);
-  /**
-   * Launching in Synchronous way.
-  */
-  DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
-  /**
-   * Copying nonces :
-   * Here again i need to check if its a valid nonce and break if possible.
-   * Now i just copy the result if my nonce is not valid.
-   * So basically i wait for all dpus to finish which is very useless.
-  */
-  DPU_FOREACH(set, dpu) {
-      DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));
-      if(golden_nonce != UINT32_MAX ){
-        bh.nonce = golden_nonce;
-        printf("--------------------------MINED A BLOCK--------------------------\n");
-        print_block_header(bh);
-        printf("little endian = %08x\n",to_little_endian_32(golden_nonce));
-        printf("big endian = %08x\n",golden_nonce);
-        break;
-      }
-      
+  golden_nonce = HOST_TOOLS_mine_stop_repeat(set,bh,target,nb_dpus,nb_boot);
+  if(golden_nonce != UINT32_MAX){
+    bh.nonce = golden_nonce;
+    printf("--------------------------MINED A BLOCK--------------------------\n");
+    print_block_header(bh);
+    printf("little endian = %08x\n",to_little_endian_32(golden_nonce));
+    printf("big endian = %08x\n",golden_nonce);
   }
-  DPU_ASSERT(dpu_free(set));
+  else{
+    //double check because uint32_max might be a solution :)
+    printf("failed\n");
+  }
 
-  if(golden_nonce == UINT32_MAX ){
-    printf("--------------------------FAILED--------------------------\n"); 
-  }
+
 }
 
 /**

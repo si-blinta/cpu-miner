@@ -39,7 +39,7 @@ uint32_t HOST_TOOLS_get_golden_nonce(struct dpu_set_t set);
 
 
 
-
+uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boot);
 
 
 

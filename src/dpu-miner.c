@@ -16,7 +16,8 @@ __host uint32_t  dpu_id;    // HOST -> WRAM 4 bytes aligned : todo improve ( may
 __host uint32_t  dpu_nb;
 __host uint8_t dpu_target[SIZE_OF_SHA_256_HASH];
 __host blockHeader dpu_block_header;
-
+__host uint32_t  dpu_nb_boot;
+uint32_t dpu_start = 0;
 /**
  * Improvements : 
  *              - Stop all tasklets when a golden nonce is found. ( Notify the host or someting ).
@@ -25,14 +26,22 @@ __host blockHeader dpu_block_header;
  * 
 */
 int main(void) {
+    print_256_bits_integer(dpu_target,"target");
     uint8_t  tasklet_id     = me();
-    uint32_t dpu_range     = UINT32_MAX / dpu_nb ;
+    uint32_t dpu_range     = (10000 / dpu_nb_boot) /dpu_nb ;
     uint32_t tasklet_range = dpu_range / NR_TASKLETS;
-    uint32_t dpu_start     = dpu_id * dpu_range;
+    if(dpu_start == 0)
+    dpu_start     = dpu_id * dpu_range*dpu_nb_boot;
     uint32_t tasklet_start = dpu_start + tasklet_id*tasklet_range ;
     uint32_t tasklet_end   = dpu_start + (tasklet_id+1) *  tasklet_range ;
-    uint32_t tasklet_nonce;  
+    uint32_t tasklet_nonce; 
+    //printf("DPU# %d : range=%d | start=%d \n", dpu_id,dpu_range,dpu_start);
+    printf("Tasklet# %d : start=%d | end=%d | \n", tasklet_id,tasklet_start,tasklet_end);
     tasklet_nonce = scan_hash(dpu_block_header,dpu_target,tasklet_start,tasklet_end-1);
+    if(tasklet_id == 0){
+        dpu_start =  dpu_start+dpu_range;
+    }
+        
     if(tasklet_nonce != UINT32_MAX){ // update dpu_nonce only if we have a valid tasklet_nonce.
         mutex_lock(my_mutex);
         finish = 1;                  // Interrupt other tasklets.

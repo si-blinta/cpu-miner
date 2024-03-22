@@ -12,9 +12,37 @@ void HOST_TOOLS_send_id(struct dpu_set_t set){
       DPU_ASSERT(dpu_copy_to(dpu, "dpu_id", 0,&id,sizeof(uint32_t)));
   }
 }
+
 void HOST_TOOLS_compile(uint8_t nb_tasklets){
     char command[100];
     sprintf(command,"make dpu-miner NB_TASKLETS=%d", nb_tasklets);
     system(command);
-    printf("Compiled dpu program with %u tasklets\n",nb_tasklets);
+}
+
+uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boot){
+    struct dpu_set_t dpu;
+    uint32_t golden_nonce = UINT32_MAX;
+    DPU_ASSERT(dpu_broadcast_to(set, "dpu_block_header", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
+    DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,target,SIZE_OF_SHA_256_HASH * sizeof(uint8_t), DPU_XFER_DEFAULT));
+    DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
+    DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb_boot", 0,&nb_boot,sizeof(nb_boot), DPU_XFER_DEFAULT));
+    DPU_ASSERT(dpu_broadcast_to(set, "dpu_nonce", 0,&golden_nonce,sizeof(golden_nonce), DPU_XFER_DEFAULT));
+    HOST_TOOLS_send_id(set);
+    for(uint32_t i = 0; i < nb_boot ; nb_boot ++){
+    
+        DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
+        DPU_FOREACH(set, dpu) {
+        DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));
+        DPU_ASSERT(dpu_log_read(dpu,stdout));
+            if(golden_nonce != UINT32_MAX ){
+                goto return_sucess;
+            }
+        }
+    }
+    DPU_ASSERT(dpu_free(set));
+    return UINT32_MAX;
+
+return_sucess:
+    DPU_ASSERT(dpu_free(set));
+    return golden_nonce;
 }
