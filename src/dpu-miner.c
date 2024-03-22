@@ -21,6 +21,7 @@ int main(void) {
     uint32_t tasklet_start = dpu_start + tasklet_id*tasklet_range ;
     uint32_t tasklet_end   = dpu_start + (tasklet_id+1) *  tasklet_range ;
     uint32_t tasklet_hashes_done = 0;  
+    print_256_bits_integer(dpu_target,"target");
     tasklet_hashes_done = scan_hash_test(dpu_block_header,dpu_target,tasklet_start,tasklet_end-1);
     return 0 ;
 }

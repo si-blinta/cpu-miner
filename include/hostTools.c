@@ -42,7 +42,7 @@ static void HOST_TOOLS_test(uint32_t nb_dpus_p, uint32_t nb_tasklets_p, uint32_t
    * Broadcasting the blockHeader , the target hash and number of dpus allocated to all DPUs
   */
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_block_header", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
-  DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,&target,sizeof(target), DPU_XFER_DEFAULT));
+  DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,target,SIZE_OF_SHA_256_HASH * sizeof(uint8_t), DPU_XFER_DEFAULT));
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
   DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb_hashes", 0,&nb_hashes,sizeof(nb_hashes), DPU_XFER_DEFAULT));
   /**
