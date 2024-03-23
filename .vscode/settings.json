@@ -12,7 +12,9 @@
         "host_tools.h": "c",
         "dpu_log.h": "c",
         "hosttools.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "compare": "c",
+        "type_traits": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

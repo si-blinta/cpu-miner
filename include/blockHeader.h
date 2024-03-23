@@ -112,8 +112,14 @@ uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t
  *       with the results on this website : https://emn178.github.io/online-tools/double_sha256
  * @param input The String to hash.
 */
-
 int unit_test_double_sha256(char* input);
+
+/**
+ * @brief This function calls nb_iterations times double sha256 used to calculate hash rate.
+ * @param nb_iterations The number of calls to double sha256.
+*/
+
+void hash_rate_test(uint32_t nb_iterations);
 
 
 #endif //BLOCK_HEADER_H

@@ -49,7 +49,7 @@ uint32_t HOST_TOOLS_get_golden_nonce(struct dpu_set_t set);
  * @param nb_dpus_p The number of dpus.
  * @param nb_tasklets_p The number of tasklets.
  * @param nb_hashes_p The number of hashes to be tested on. 
- * @param type The type of test. (DPU_TEST OR TASKLET_TEST)
+ * @param type The type of test.
  */
 static void HOST_TOOLS_test(uint32_t nb_dpus_p, uint32_t nb_tasklets_p, uint32_t nb_hashes_p, uint8_t type, char* path);
 
@@ -58,14 +58,14 @@ static void HOST_TOOLS_test(uint32_t nb_dpus_p, uint32_t nb_tasklets_p, uint32_t
  *        Calculates Sol/s.
  * @param path A path for the csv file.
 */
-void HOST_TOOLS_tasklet_test(char* path);
+void HOST_TOOLS_tasklet_test(char* path,uint8_t type);
 
 /**
  * @brief A performance test on tasklets, it runs scanhash it runs scanhash multiple times,it varys number of dpus from 10 to 1000, using 10 tasklets.
  *        Calculates Sol/s.
  * @param path A path for the csv file.
 */
-void HOST_TOOLS_dpu_test(char* path);
+void HOST_TOOLS_dpu_test(char* path, uint8_t type);
 
 
 

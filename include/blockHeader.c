@@ -170,4 +170,12 @@ uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t
 int unit_test_double_sha256(char* input){
   return 0;
 }
+void hash_rate_test(uint32_t nb_iterations){
+    uint8_t hash[SIZE_OF_SHA_256_HASH];
+    for(uint32_t i = 0; i < nb_iterations; i++){
+        calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
+        calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
+    }
+
+}
 #endif //DPU
