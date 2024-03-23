@@ -64,19 +64,19 @@ static void HOST_TOOLS_test(uint32_t nb_dpus_p, uint32_t nb_tasklets_p, uint32_t
   {
   case DPU_SOL_TEST:
     printf("Did %u solutions in %lf seconds  => Sol/s = %lf\n",nb_hashes,duration, (double) nb_hashes/duration);
-    fprintf(performance_file,"%d;%lf\n",nb_dpus,(double) nb_hashes/duration);  // for dpus
+    fprintf(performance_file,"%d;%lf\n",nb_dpus,(double) nb_hashes/duration); 
     break;
   case TASKLET_SOL_TEST:
     printf("Did %u solutions in %lf seconds  => Sol/s = %lf\n",nb_hashes,duration, (double) nb_hashes/duration);
-    fprintf(performance_file,"%d;%lf\n",nb_tasklets,(double) nb_hashes/duration);  // for dpus
+    fprintf(performance_file,"%d;%lf\n",nb_tasklets,(double) nb_hashes/duration); 
     break;
   case DPU_HASHRATE_TEST:
     printf("Did %u hashes in %lf seconds  => Hashes/s = %lf\n",nb_hashes,duration, (double) nb_hashes/duration);
-    fprintf(performance_file,"%d;%lf\n",nb_dpus,(double) nb_hashes/duration);  // for dpus
+    fprintf(performance_file,"%d;%lf\n",nb_dpus,(double) nb_hashes/duration); 
     break;
   case TASKLET_HASHRATE_TEST:
     printf("Did %u hashes in %lf seconds  => Hashes/s = %lf\n",nb_hashes,duration, (double) nb_hashes/duration);
-    fprintf(performance_file,"%d;%lf\n",nb_tasklets,(double) nb_hashes/duration);  // for dpus
+    fprintf(performance_file,"%d;%lf\n",nb_tasklets,(double) nb_hashes/duration);  
     break;
   default:
     break;
