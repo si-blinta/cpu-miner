@@ -10,7 +10,8 @@
         "blockheader.h": "c",
         "dpu.h": "c",
         "host_tools.h": "c",
-        "dpu_log.h": "c"
+        "dpu_log.h": "c",
+        "hosttools.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

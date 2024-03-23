@@ -1,4 +1,22 @@
 #include "hostTools.h"
+
+void HOST_TOOLS_parse_args(int argc, char** argv, uint32_t* nb_dpus,uint8_t* nb_tasklets){
+    if(argc < 3){
+    fprintf(stderr,"Usage : %s [nb_dpus] [nb_tasklets]\n",argv[0]);
+    fprintf(stdout,"0 if you want to allocate all available DPUs\n");
+    exit(EXIT_FAILURE);
+  }
+  if(atoi(argv[2]) <= 0 ||  atoi(argv[2]) > 24 || atoi(argv[1]) < 0 || atoi(argv[1]) > 1280){
+    fprintf(stderr,"1 <= nb_tasklets <= 24  0 <= nb_dpus <= 1280 \n");
+    exit(EXIT_FAILURE);
+  }
+  *nb_dpus     = atoi(argv[1]);
+  *nb_tasklets = atoi(argv[2]);
+  if(  *nb_dpus == 0 )
+    *nb_dpus = DPU_ALLOCATE_ALL;
+}
+
+
 void HOST_TOOLS_allocate_dpus(struct dpu_set_t* set,uint32_t* nb_dpus){
     DPU_ASSERT(dpu_alloc(*nb_dpus, NULL, set));
     DPU_ASSERT(dpu_get_nr_dpus(*set,nb_dpus));
@@ -28,12 +46,13 @@ uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb_boot", 0,&nb_boot,sizeof(nb_boot), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_nonce", 0,&golden_nonce,sizeof(golden_nonce), DPU_XFER_DEFAULT));
     HOST_TOOLS_send_id(set);
-    for(uint32_t i = 0; i < nb_boot ; nb_boot ++){
-    
+    for(uint32_t i = 0; i < nb_boot ; i ++){
+#if DEBUG
+            printf("BOOT #%d little endian nonce = %08x\n",i,to_little_endian_32(golden_nonce));
+#endif//DEBUG         
         DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
         DPU_FOREACH(set, dpu) {
-        DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));
-        DPU_ASSERT(dpu_log_read(dpu,stdout));
+        DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));           
             if(golden_nonce != UINT32_MAX ){
                 goto return_sucess;
             }
