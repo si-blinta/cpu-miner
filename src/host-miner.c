@@ -28,13 +28,14 @@ int main(int argc, char** argv) {
   uint32_t golden_nonce = UINT32_MAX; // initialize it as unvalid nonce
   uint32_t nb_boot      = 1000;
   blockHeader bh;
+  uint32_t found = 0;
   uint8_t target[SIZE_OF_SHA_256_HASH];
   //Generating block header and calculating target hash
   generate_block_header(&bh);                 
   calculate_target_from_bits(bh.bits,target); 
   print_256_bits_integer(target,"Target Hash");
-  golden_nonce = HOST_TOOLS_mine_stop_repeat(set,bh,target,nb_dpus,nb_boot);
-  if(golden_nonce != UINT32_MAX){
+  golden_nonce = HOST_TOOLS_mine_stop_repeat(set,bh,target,nb_dpus,nb_boot,&found);
+  if(found){
     bh.nonce = golden_nonce;
     print_256_bits_integer(target,"Target Hash");
     printf("--------------------------MINED A BLOCK--------------------------\n");
@@ -43,19 +44,6 @@ int main(int argc, char** argv) {
     printf("big endian = %08x\n",golden_nonce);
   }
   else{
-    //double check because uint32_max might be a solution :)
-    uint8_t hash[SIZE_OF_SHA_256_HASH];
-    calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
-    calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
-    if(compare_hashes(hash,target,SIZE_OF_SHA_256_HASH) <= 0 ){
-      bh.nonce = golden_nonce;
-      print_256_bits_integer(target,"Target Hash");
-      printf("--------------------------MINED A BLOCK--------------------------\n");
-      print_block_header(bh);
-      printf("little endian = %08x\n",to_little_endian_32(golden_nonce));
-      printf("big endian = %08x\n",golden_nonce);
-    }
-    else 
       printf("failed\n");
     }
     

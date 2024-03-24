@@ -52,7 +52,7 @@ void HOST_TOOLS_compile(uint8_t nb_tasklets);
  * @return The nonce, UINT32_MAX if not valid.
  * @note   Even id the result is UINT32_MAX we need to double check because it is a possible value for a nonce.
 */
-uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boot);
+uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boot, uint32_t* host_found);
 
 
 

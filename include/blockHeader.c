@@ -1,5 +1,4 @@
 #include "blockHeader.h"
-uint8_t finish = 0;
 uint32_t to_little_endian_32(uint32_t value) {
     return ((value & 0xFF) << 24) |
            ((value & 0xFF00) << 8) |
@@ -133,46 +132,21 @@ int compare_hashes(const uint8_t *hash1, const uint8_t *hash2, size_t size) {
     return 0; // hashes are equal
 }
 #ifdef DPU
-uint32_t scan_hash_test(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end) {
-    perfcounter_config (COUNT_CYCLES , true);
-    uint32_t hash_count = 0;
-    uint32_t cycles     = 0;
-    uint8_t hash[SIZE_OF_SHA_256_HASH];
-    char concatenated_header[CONCAT_LENGTH];
-    for (uint32_t nonce = bh.nonce + nonce_start ; nonce <= nonce_end; nonce++) {
-        bh.nonce = nonce; // Update nonce in block header
-        concat_block_header(bh,concatenated_header);
-        calc_sha_256(hash, concatenated_header, strlen(concatenated_header));
-        calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
-        hash_count++;
-        if (compare_hashes(hash, target, SIZE_OF_SHA_256_HASH) < 0) {
-            cycles = perfcounter_get();
-            printf("Did %d Hashes in %lf seconds => Hash rate = %lf\n",hash_count,(double) cycles / CLOCKS_PER_SEC,(double) hash_count / ( (double) cycles / CLOCKS_PER_SEC));
-            print_256_bits_integer(hash,"hash");
-            return nonce; 
-        }
-    }
-    printf("Failure! Hash not found :\n");
-	cycles = perfcounter_get();
-    printf("Did %d Hashes in %lf seconds => Hash rate = %lf\n",hash_count,(double) cycles / CLOCKS_PER_SEC,(double) hash_count / ( (double) cycles / CLOCKS_PER_SEC));
-    return UINT32_MAX; // Return false if no valid hash is found within nonce range
-}
-uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end) {
+uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end, uint32_t* dpu_found) {
     uint8_t hash[SIZE_OF_SHA_256_HASH];
     char concatenated_header[CONCAT_LENGTH];
     for (uint32_t nonce = bh.nonce + nonce_start ; nonce < nonce_end; nonce++) {
-        if(finish != 0){
-            return UINT32_MAX;
-        }
         bh.nonce = nonce; // Update nonce in block header
         concat_block_header(bh,concatenated_header);
         calc_sha_256(hash, concatenated_header, strlen(concatenated_header));
         calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
         if (compare_hashes(hash, target, SIZE_OF_SHA_256_HASH) < 0) {
+            *dpu_found = 1;
             return nonce; 
             
         }
     }
+    *dpu_found  = 0;
     return UINT32_MAX; // Return 0xffffffff if no valid hash is found within nonce range
 }
 #endif //DPU

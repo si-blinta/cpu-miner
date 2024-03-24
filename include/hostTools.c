@@ -37,9 +37,10 @@ void HOST_TOOLS_compile(uint8_t nb_tasklets){
     system(command);
 }
 
-uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boot){
+uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boot, uint32_t* host_found){
     struct dpu_set_t dpu;
     uint32_t golden_nonce = UINT32_MAX;
+    uint32_t found        = 0;
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_block_header", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,target,SIZE_OF_SHA_256_HASH * sizeof(uint8_t), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
@@ -48,20 +49,23 @@ uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_
     HOST_TOOLS_send_id(set);
     for(uint32_t i = 0; i < nb_boot ; i ++){
 #if DEBUG
-            printf("BOOT #%d little endian nonce = %08x\n",i,to_little_endian_32(golden_nonce));
+            printf("BOOT #%d little endian nonce = %08x : found = %d\n",i,to_little_endian_32(golden_nonce),found);
 #endif//DEBUG         
         DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
         DPU_FOREACH(set, dpu) {
-        DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));           
-            if(golden_nonce != UINT32_MAX ){
-                goto return_sucess;
+            DPU_ASSERT(dpu_copy_from(dpu,"dpu_found",0,&found,sizeof(uint32_t)));
+            if(found){
+                DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));  
+                goto return_success;
             }
         }
     }
     DPU_ASSERT(dpu_free(set));
+    *host_found = 0;
     return UINT32_MAX;
 
-return_sucess:
+return_success:
     DPU_ASSERT(dpu_free(set));
+    *host_found = 1;
     return golden_nonce;
 }
