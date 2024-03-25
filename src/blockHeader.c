@@ -1,4 +1,4 @@
-#include "blockHeader.h"
+#include "../include/blockHeader.h"
 uint8_t finish = 0;
 uint32_t to_little_endian_32(uint32_t value) {
     return ((value & 0xFF) << 24) |

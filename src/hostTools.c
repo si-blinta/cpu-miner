@@ -1,4 +1,4 @@
-#include "hostTools.h"
+#include "../include/hostTools.h"
 void HOST_TOOLS_allocate_dpus(struct dpu_set_t* set,uint32_t* nb_dpus){
     DPU_ASSERT(dpu_alloc(*nb_dpus, NULL, set));
     DPU_ASSERT(dpu_get_nr_dpus(*set,nb_dpus));
