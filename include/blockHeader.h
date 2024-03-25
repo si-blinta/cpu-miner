@@ -4,9 +4,6 @@
 #ifdef HOST
 #include <time.h>
 #endif //HOST
-#ifdef DPU
-#include <perfcounter.h>
-#endif  //DPU
 #define CONCAT_LENGTH 161           // Size of concatenated blockHeader. : // 8 characters for each 32-bit int (hex) + 64 characters for each hash (hex) + null terminator
                                     // 8 + 64 + 64 + 8 + 8 + 8 + 1 = 161.
 #define TRAILING_ZEROS(x) ((x)+6)/2

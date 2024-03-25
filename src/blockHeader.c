@@ -1,4 +1,4 @@
-#include "blockHeader.h"
+#include "../include/blockHeader.h"
 uint32_t to_little_endian_32(uint32_t value) {
     return ((value & 0xFF) << 24) |
            ((value & 0xFF00) << 8) |
@@ -25,8 +25,8 @@ void generate_block_header(blockHeader *block_header) {
     block_header->time 	  = (uint32_t)time(NULL); 		    // Current time
     block_header->bits    = rand() %0x7fffff +0x008000 ;    // Mantissa maximum legal value = 0x7fffff,
 															// 0x008000 is the smallest legal   source : https://wiki.bitcoinsv.io/index.php/Difficulty 
-	uint8_t r             = rand() % 6 + 50;				// We limit the randomness of exponent because it may take infinite time with my potato pc 
-	uint32_t exponent     = TRAILING_ZEROS(52);				// this macro will make sure to have 50 to 56 trailing zeros so the target will start with
+	uint8_t r             = rand() % 5 + 52;				// We limit the randomness of exponent because it may take infinite time with my potato pc 
+	uint32_t exponent     = TRAILING_ZEROS(r);				// this macro will make sure to have 50 to 56 trailing zeros so the target will start with
 															// at least (64-56-4) 4 zeros. 64 = nb bytes of sha256 hash, 56 = nb bytes as trailing zeros
 															// 4 = minimum of bytes as leading zeros that a mantissa can have (0x008000 is the smallest legal).
 	block_header->bits    = block_header->bits | exponent << 24;

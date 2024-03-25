@@ -1,4 +1,4 @@
-#include "hostTools.h"
+#include "../include/hostTools.h"
 
 void HOST_TOOLS_parse_args(int argc, char** argv, uint32_t* nb_dpus,uint8_t* nb_tasklets){
     if(argc < 3){
