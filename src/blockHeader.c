@@ -19,7 +19,7 @@ void uint8_t_to_hex(uint8_t value, char* buffer) {
     buffer[0] = hex_chars[value >> 4];
     buffer[1] = hex_chars[value & 0x0F];
 }
-#ifdef HOST
+#ifndef DPU
 void generate_block_header(blockHeader *block_header) {
     // Correctly generate random values for integers
     block_header->version = (uint32_t)rand(); 			    // Random version
@@ -40,7 +40,7 @@ void generate_block_header(blockHeader *block_header) {
         block_header->merkle_root_hash[i] = (uint8_t)(rand() % 256);
     }
 }
-#endif //HOST
+#endif //DPU
 
 void print_block_header(const blockHeader block_header) {
     printf("Big endian :Version: %08x\n", block_header.version);

@@ -1,10 +1,10 @@
 #ifndef BLOCK_HEADER_H
 #define BLOCK_HEADER_H
 #include "sha-256.h"
-#ifdef HOST
+#ifndef DPU
 #include <time.h>
 //#include <curl/curl.h>
-#endif //HOST
+#endif //DPU
 #ifdef DPU
 #include <perfcounter.h>
 #endif  //DPU
@@ -42,13 +42,13 @@ void uint32_t_to_hex(uint32_t value, char* buffer);
  * @param buffer The buffer to store in the result.
 */
 void uint8_t_to_hex(uint8_t value, char* buffer);
-#ifdef HOST
+#ifndef DPU
 /**
  * @brief Generates a random block header for testing purposes. ( not totally random )
  * @param block_header Pointer to the block header structure.
 */
 void generate_block_header(blockHeader *block_header);
-#endif //HOST
+#endif //DPU
 /**
  * @brief Prints block header contents in Big / Little endian.
  * @param block_header The block header to print.
