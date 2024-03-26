@@ -8,21 +8,18 @@
 #include <sys/socket.h>
 #include <arpa/inet.h> 
 #include <netinet/in.h>
-#ifndef DPU_BINARY
-#define DPU_BINARY "bin/dpu-miner"
-#endif
-#define DEBUG 1
-
+#include "../include/config.h"
 /**
  * @brief This function simply parse arguments from commandline and update variables.
  * @param argc Number of arguments.
  * @param argv The values of arguments.
  * @param nb_dpus The pointer to nb_dpu variable to update.
  * @param nb_tasklets The pointer to nb_tasklets variable to update.
+ * @param nb_boots The pointer to nb_boots variable to update.
  * 
 */
 
-void HOST_TOOLS_parse_args(int argc, char** argv, uint32_t* nb_dpus,uint8_t* nb_tasklets);
+void HOST_TOOLS_parse_args(int argc, char** argv, uint32_t* nb_dpus,uint8_t* nb_tasklets,uint32_t* nb_boots);
 
 
 /**
@@ -56,11 +53,12 @@ void HOST_TOOLS_compile(uint8_t nb_tasklets);
  * @param bh  The block header.
  * @param target The target hash.
  * @param nb_dpus The number of dpus used ,useful for dpus to compute their nonce space.
- * @param nb_boot The number of times we are booting the dpus, useful for dpus to compute their nonce space.
+ * @param nb_boots The number of times we are booting the dpus, useful for dpus to compute their nonce space.
  * @return The nonce, UINT32_MAX if not valid.
  * @note   Even id the result is UINT32_MAX we need to double check because it is a possible value for a nonce.
 */
-uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boot, uint32_t* host_found);
+uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],
+                                    uint32_t nb_dpus,uint32_t nb_boots, uint32_t* host_found);
 
 /**
  * @brief Connect to the bitcoin to a server using udp.
@@ -71,5 +69,5 @@ int HOST_TOOLS_connect(const char* server_ip, int server_port,struct sockaddr_in
 
 
 void HOST_TOOLS_mine(struct sockaddr_in server_addr,int sockfd,struct dpu_set_t set,uint32_t nb_dpus,
-                    size_t number_of_blocks_to_mine,uint16_t nb_boot);
+                    size_t number_of_blocks_to_mine,uint32_t nb_boots);
 #endif // HOST_TOOLS_H

@@ -4,10 +4,7 @@
 #ifndef DPU
 #include <time.h>
 #endif //HOST
-#define CONCAT_LENGTH 161           // Size of concatenated blockHeader. : // 8 characters for each 32-bit int (hex) + 64 characters for each hash (hex) + null terminator
-                                    // 8 + 64 + 64 + 8 + 8 + 8 + 1 = 161.
-#define TRAILING_ZEROS(x) ((x)+6)/2
-#define EASY
+#include "../include/config.h"
 typedef struct {
     int32_t version;                // Version of the block
     uint8_t previous_hash[32];      // Hash of the previous block in the chain

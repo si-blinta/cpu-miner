@@ -26,7 +26,7 @@ void generate_block_header(blockHeader *block_header) {
     block_header->bits    = rand() %0x7fffff +0x008000 ;    // Mantissa maximum legal value = 0x7fffff,
 															// 0x008000 is the smallest legal   source : https://wiki.bitcoinsv.io/index.php/Difficulty 
 	uint8_t r             = rand() % 5 + 52;				// We limit the randomness of exponent because it may take infinite time with my potato pc 
-	uint32_t exponent     = TRAILING_ZEROS(r);				// this macro will make sure to have 50 to 56 trailing zeros so the target will start with
+	uint32_t exponent     = TRAILING_ZEROS(56);				// this macro will make sure to have 50 to 56 trailing zeros so the target will start with
 															// at least (64-56-4) 4 zeros. 64 = nb bytes of sha256 hash, 56 = nb bytes as trailing zeros
 															// 4 = minimum of bytes as leading zeros that a mantissa can have (0x008000 is the smallest legal).
 	block_header->bits    = block_header->bits | exponent << 24;
@@ -42,6 +42,7 @@ void generate_block_header(blockHeader *block_header) {
 #endif //DPU
 
 void print_block_header(const blockHeader block_header) {
+    printf("###################BLOCK HEADER#########################\n");
     printf("Big endian :Version: %08x\n", block_header.version);
 	printf("Little endian :Version: %08x\n",to_little_endian_32(block_header.version));
     print_256_bits_integer(block_header.previous_hash,"Previous Hash");
@@ -56,6 +57,7 @@ void print_block_header(const blockHeader block_header) {
     concat_block_header(block_header,concat);
     printf("Little endian :Concatenated block header:\n%s\n",concat);
     printf("\n");
+    printf("#######################################################\n");
 }
 void print_256_bits_integer(const uint8_t value[SIZE_OF_SHA_256_HASH],const char* name){
     printf("Big endian :%s: \n",name);

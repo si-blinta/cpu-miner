@@ -38,27 +38,27 @@ int main(int argc, char *argv[]) {
         
         int bytes_received = recvfrom(sockfd, buffer, BLOCK_HEADER_PACKET_SIZE , 0, (struct sockaddr *)&client_addr, &len);
           if(bytes_received == -1){
-            perror("[recvfrom]xd");
+            perror("[SERVER][recvfrom]");
             exit(1);
           }  
         switch (buffer[0])
         {
         case GET:
-            printf("#SERVER# RECEIVED GET\n");
+            printf("[SERVER] Received request block\n");
             generate_block_header(&block);
-            printf("##################\n");
-            print_block_header(block);
-            printf("##################\n");
+            printf("[SERVER] Block generated\n");
             send_block(&client_addr,sockfd,&block,len);
+            printf("[SERVER] Block sent\n");
             break;
         
         case PUT:
-            printf("#SERVER# RECEIVED PUT\n");
+            printf("[SERVER] Received a block\n");
             deserialize(&block,buffer+1);
+            printf("[SERVER] Verifying the block\n");
             verify_block(block);
             break;
         default:
-            printf("#SERVER# UNEXPECTED REQUEST\n");
+            printf("[SERVER] Unexpected block\n");
             break;
         }
     }

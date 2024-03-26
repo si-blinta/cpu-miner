@@ -34,7 +34,6 @@ void deserialize(blockHeader *data, const char *buffer) {
     // Add more members deserialization as needed
 }
 int get_block(const struct sockaddr_in* dest_addr, int sockfd){
-    printf("GET BLOCK\n");
     char buffer[BLOCK_HEADER_PACKET_SIZE] = {GET};
     if(sendto(sockfd, buffer, BLOCK_HEADER_PACKET_SIZE, 0,(struct sockaddr*) dest_addr, sizeof(*dest_addr))<0){
             perror("[get_block][sendto]");
@@ -64,14 +63,14 @@ int verify_block(blockHeader block_header){
     calc_sha_256(block_hash,block_hash,SIZE_OF_SHA_256_HASH);
 
     if(compare_hashes(block_hash,target,SIZE_OF_SHA_256_HASH) < 0){
-        printf("#SERVER# BLOCK ACCEPTED\nPROOF:\n");
-        print_256_bits_integer(block_hash,"#SERVER# HASH RECEIVED");
-        print_256_bits_integer(target,"#SERVER# TARGET");
+        printf("[SERVER] Block accepted \n[SERVER] Proof:\n");
+        print_256_bits_integer(block_hash,"block hash");
+        print_256_bits_integer(target,"target hash");
         return 0;
     }
-    printf("#SERVER# BLOCK DENIED\n#SERVER# PROOF:\n");
-    print_256_bits_integer(block_hash,"#SERVER# HASH RECEIVED");
-    print_256_bits_integer(target,"#SERVER# TARGET");
+    printf("[SERVER] Block rejected\n[SERVER] Proof:\n"); 
+    print_256_bits_integer(block_hash,"block hash");
+    print_256_bits_integer(target,"target hash");
     return -1;
    
 

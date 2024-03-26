@@ -1,7 +1,5 @@
 #ifndef BITCOIN_REQUEST_H
 #define BITCOIN_REQUEST_H
-#define BLOCK_HEADER_PACKET_SIZE 81
-#define BITCOIN_PORT 8831
 #include "blockHeader.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,7 +8,7 @@
 #include <errno.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-
+#include "../include/config.h"
 enum bitcoin_request{
     GET,
     PUT,
