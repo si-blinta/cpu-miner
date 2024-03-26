@@ -84,7 +84,9 @@ int compare_hashes(const uint8_t *hash1, const uint8_t *hash2, size_t size);
  * @param target The target hash.
  * @param nonce_start The first nonce value to be tested. 
  * @param nonce_end The maximum nonce value to be tested.
+ * @param dpu_found The adress to a flag to signal if a solution is found.
  * @return The nonce value that satisfies the condition, or 0xffffffff if not found.
+ * @note You must rely only on dpu_found to be sure of the validity of a nonce because 0xffffffff (UINT32_MAX) can be a valid nonce.
  */
 uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end, uint32_t* dpu_found);
 

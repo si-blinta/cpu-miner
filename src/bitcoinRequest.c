@@ -1,5 +1,5 @@
 #include "../include/bitcoinRequest.h"
-// Serialize the structure into a byte stream
+
 void serialize(const  blockHeader *data, char *buffer) {
     size_t offset = 0;
     memcpy(buffer + offset, &data->version, sizeof(data->version));
@@ -16,7 +16,7 @@ void serialize(const  blockHeader *data, char *buffer) {
     offset += sizeof(data->nonce);
 }
 
-// Deserialize the byte stream into the structure
+
 void deserialize(blockHeader *data, const char *buffer) {
     size_t offset = 0;
     memcpy(&data->version, buffer + offset, sizeof(data->version));
@@ -31,7 +31,7 @@ void deserialize(blockHeader *data, const char *buffer) {
     offset += sizeof(data->bits);
     memcpy(&data->nonce, buffer + offset, sizeof(data->nonce));
     offset += sizeof(data->nonce);
-    // Add more members deserialization as needed
+
 }
 int get_block(const struct sockaddr_in* dest_addr, int sockfd){
     char buffer[BLOCK_HEADER_PACKET_SIZE] = {GET};

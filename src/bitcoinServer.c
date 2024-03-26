@@ -8,16 +8,13 @@
 #include <arpa/inet.h> 
 #include <netinet/in.h>
 int init_server(int* sockfd,struct sockaddr_in server_addr, int port){
-    // Create socket
     if ((*sockfd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
         perror("socket");
         exit(EXIT_FAILURE);
     }
-    // Set server address struct
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(port);
-    // Bind
     if (bind(*sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
         perror("bind");
         exit(EXIT_FAILURE);

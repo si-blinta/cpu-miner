@@ -1,18 +1,18 @@
 #include "../include/hostTools.h"
-void HOST_TOOLS_parse_args(int argc, char** argv, uint32_t* nb_dpus,uint8_t* nb_tasklets,uint32_t* nb_boots){
-    if(argc < 4){
-    fprintf(stderr,"Usage : %s [nb_dpus] [nb_tasklets] [nb_boots]\n",argv[0]);
+void HOST_TOOLS_parse_args(int argc, char** argv, uint32_t* nb_dpus,uint8_t* nb_tasklets,uint32_t* nb_boots,uint32_t* nb_blocks_to_mine){
+    if(argc < 5){
+    fprintf(stderr,"Usage : %s [nb_dpus] [nb_tasklets] [nb_boots] [nb_blocks_to_mine]\n",argv[0]);
     fprintf(stdout,"0 if you want to allocate all available DPUs\n");
     exit(EXIT_FAILURE);
   }
-  if(atoi(argv[2]) <= 0 ||  atoi(argv[2]) > 24 || atoi(argv[1]) < 0 || atoi(argv[1]) > 1280 || atoi(argv[3]) < 0){
+  if(atoi(argv[2]) <= 0 ||  atoi(argv[2]) > 24 || atoi(argv[1]) < 0 || atoi(argv[1]) > 1280 || atoi(argv[3]) < 0 || atoi(argv[4]) < 0){
     fprintf(stderr,"1 <= nb_tasklets <= 24 | 0 <= nb_dpus <= 1280 | nb_boots > 1 \n");
     exit(EXIT_FAILURE);
   }
   *nb_dpus     = (uint32_t)atoi(argv[1]);
   *nb_tasklets = (uint32_t)atoi(argv[2]);
   *nb_boots = (uint32_t)atoi(argv[3]);
-  printf("BOOOOOOTS = %u\n",*nb_boots);
+  *nb_blocks_to_mine = (uint32_t)atoi(argv[4]);
   if(  *nb_dpus == 0 )
     *nb_dpus = DPU_ALLOCATE_ALL;
 }
@@ -38,7 +38,7 @@ void HOST_TOOLS_compile(uint8_t nb_tasklets){
     system(command);
 }
 
-uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boots, uint32_t* host_found){
+uint32_t HOST_TOOLS_mine_multiple_boot( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boots, uint32_t* host_found){
     printf("Mining with number of boots = %u\n",nb_boots);
     struct dpu_set_t dpu;
     uint32_t golden_nonce = UINT32_MAX;
@@ -105,7 +105,7 @@ void HOST_TOOLS_mine(struct sockaddr_in server_addr,int sockfd,struct dpu_set_t 
     print_256_bits_integer(target,"Target Hash");
     print_block_header(bh);
 #endif//HOST_DEBUG
-    golden_nonce = HOST_TOOLS_mine_stop_repeat(set,bh,target,nb_dpus,nb_boots,&found);
+    golden_nonce = HOST_TOOLS_mine_multiple_boot(set,bh,target,nb_dpus,nb_boots,&found);
     if(found){
         bh.nonce = golden_nonce;
         send_block(&server_addr,sockfd,&bh,sizeof(server_addr));
