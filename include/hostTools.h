@@ -3,10 +3,14 @@
 #include <dpu.h>
 #include <assert.h>
 #include "blockHeader.h"
+#include "../include/bitcoinRequest.h"
 #include <errno.h>
 #include <sys/socket.h>
 #include <arpa/inet.h> 
 #include <netinet/in.h>
+#ifndef DPU_BINARY
+#define DPU_BINARY "bin/dpu-miner"
+#endif
 #define DEBUG 1
 
 /**
@@ -65,4 +69,7 @@ uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_
 int HOST_TOOLS_connect(const char* server_ip, int server_port,struct sockaddr_in* server_addr,int* sockfd);
 
 
+
+void HOST_TOOLS_mine(struct sockaddr_in server_addr,int sockfd,struct dpu_set_t set,uint32_t nb_dpus,
+                    size_t number_of_blocks_to_mine,uint16_t nb_boot);
 #endif // HOST_TOOLS_H

@@ -1,5 +1,4 @@
 #include "../include/hostTools.h"
-
 void HOST_TOOLS_parse_args(int argc, char** argv, uint32_t* nb_dpus,uint8_t* nb_tasklets){
     if(argc < 3){
     fprintf(stderr,"Usage : %s [nb_dpus] [nb_tasklets]\n",argv[0]);
@@ -46,6 +45,7 @@ uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb_boot", 0,&nb_boot,sizeof(nb_boot), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_nonce", 0,&golden_nonce,sizeof(golden_nonce), DPU_XFER_DEFAULT));
+    DPU_ASSERT(dpu_broadcast_to(set, "dpu_found", 0,&found,sizeof(found), DPU_XFER_DEFAULT));
     HOST_TOOLS_send_id(set);
     for(uint32_t i = 0; i < nb_boot ; i ++){
 #if DEBUG
@@ -60,12 +60,12 @@ uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_
             }
         }
     }
-    DPU_ASSERT(dpu_free(set));
+    //DPU_ASSERT(dpu_free(set));
     *host_found = 0;
     return UINT32_MAX;
 
 return_success:
-    DPU_ASSERT(dpu_free(set));
+    //DPU_ASSERT(dpu_free(set));
     *host_found = 1;
     return golden_nonce;
 }
@@ -81,3 +81,33 @@ int HOST_TOOLS_connect(const char* server_ip, int server_port,struct sockaddr_in
     printf("Connected to bitcoin server\n");
     return 0;
 }
+
+/*void HOST_TOOLS_mine(struct sockaddr_in server_addr,int sockfd,struct dpu_set_t set,uint32_t nb_dpus,
+                    size_t number_of_blocks_to_mine,uint16_t nb_boot){
+  blockHeader bh;
+  uint32_t golden_nonce;
+  uint32_t found = 0;
+  uint8_t target[SIZE_OF_SHA_256_HASH];
+  char buffer[BLOCK_HEADER_PACKET_SIZE];
+  for(size_t i = 0 ; i < number_of_blocks_to_mine; i++){
+
+    get_block(&server_addr,sockfd);
+    recvfrom(sockfd,buffer,BLOCK_HEADER_PACKET_SIZE,0,NULL,NULL);
+    deserialize(&bh,buffer+1);
+    calculate_target_from_bits(bh.bits,target); 
+    print_256_bits_integer(target,"Target Hash");
+    print_block_header(bh);
+    golden_nonce = HOST_TOOLS_mine_stop_repeat(set,bh,target,nb_dpus,nb_boot,&found);
+    if(found){
+        bh.nonce = golden_nonce;
+        printf("--------------------------MINED A BLOCK--------------------------\n");
+        print_block_header(bh);
+        send_block(&server_addr,sockfd,&bh,sizeof(server_addr));
+    }
+    else{
+        printf("failed\n");
+        }
+  
+  }
+
+}*/

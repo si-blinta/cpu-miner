@@ -44,18 +44,21 @@ int main(int argc, char *argv[]) {
         switch (buffer[0])
         {
         case GET:
-            printf("RECEIVED GET\n");
+            printf("#SERVER# RECEIVED GET\n");
             generate_block_header(&block);
+            printf("##################\n");
+            print_block_header(block);
+            printf("##################\n");
             send_block(&client_addr,sockfd,&block,len);
             break;
         
         case PUT:
-            printf("RECEIVED PUT\n");
+            printf("#SERVER# RECEIVED PUT\n");
             deserialize(&block,buffer+1);
             verify_block(block);
             break;
         default:
-            printf("UNEXPECTED REQUEST\n");
+            printf("#SERVER# UNEXPECTED REQUEST\n");
             break;
         }
     }

@@ -64,14 +64,14 @@ int verify_block(blockHeader block_header){
     calc_sha_256(block_hash,block_hash,SIZE_OF_SHA_256_HASH);
 
     if(compare_hashes(block_hash,target,SIZE_OF_SHA_256_HASH) < 0){
-        printf("BLOCK ACCEPTED\nPROOF:\n");
-        print_256_bits_integer(block_hash,"HASH RECEIVED");
-        print_256_bits_integer(target,"TARGET");
+        printf("#SERVER# BLOCK ACCEPTED\nPROOF:\n");
+        print_256_bits_integer(block_hash,"#SERVER# HASH RECEIVED");
+        print_256_bits_integer(target,"#SERVER# TARGET");
         return 0;
     }
-    printf("BLOCK DENIED\nPROOF:\n");
-    print_256_bits_integer(block_hash,"HASH RECEIVED");
-    print_256_bits_integer(target,"TARGET");
+    printf("#SERVER# BLOCK DENIED\n#SERVER# PROOF:\n");
+    print_256_bits_integer(block_hash,"#SERVER# HASH RECEIVED");
+    print_256_bits_integer(target,"#SERVER# TARGET");
     return -1;
    
 
