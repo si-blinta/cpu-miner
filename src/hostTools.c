@@ -39,7 +39,7 @@ void HOST_TOOLS_compile(uint8_t nb_tasklets){
 }
 
 uint32_t HOST_TOOLS_mine_multiple_boot( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boots, uint32_t* host_found){
-    printf("Mining with number of boots = %u\n",nb_boots);
+    printf("[HOST] Mining the block with number of boots = %u\n",nb_boots);
     struct dpu_set_t dpu;
     uint32_t golden_nonce = UINT32_MAX;
     uint32_t found        = 0;
@@ -96,18 +96,20 @@ void HOST_TOOLS_mine(struct sockaddr_in server_addr,int sockfd,struct dpu_set_t 
   uint8_t target[SIZE_OF_SHA_256_HASH];
   char buffer[BLOCK_HEADER_PACKET_SIZE];
   for(size_t i = 0 ; i < number_of_blocks_to_mine; i++){
-
+    printf("[HOST] Get block\n");
     get_block(&server_addr,sockfd);
-    recvfrom(sockfd,buffer,BLOCK_HEADER_PACKET_SIZE,0,NULL,NULL);
+    recvfrom(sockfd,buffer,BLOCK_HEADER_PACKET_SIZE,0,NULL,NULL);  
+    printf("[HOST] Received block\n");
     deserialize(&bh,buffer+1);
     calculate_target_from_bits(bh.bits,target); 
-#if HOST_DEBUG    
     print_256_bits_integer(target,"Target Hash");
+#if HOST_DEBUG    
     print_block_header(bh);
 #endif//HOST_DEBUG
     golden_nonce = HOST_TOOLS_mine_multiple_boot(set,bh,target,nb_dpus,nb_boots,&found);
     if(found){
-        bh.nonce = golden_nonce;
+        bh.nonce = golden_nonce;      
+    printf("[HOST] Block sent\n");
         send_block(&server_addr,sockfd,&bh,sizeof(server_addr));
     }
   }

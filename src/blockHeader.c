@@ -30,7 +30,7 @@ void generate_block_header(blockHeader *block_header) {
 	r             = rand() % 5 + 52;
 #endif
 #if DIFFICULTY == 2
-    r             = rand() % 5 + 50;
+    r             = rand() % 6 + 51;
 #endif
 #if DIFFICULTY == 3
 	r             = rand() % 5 + 48;
