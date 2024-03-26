@@ -69,3 +69,15 @@ return_success:
     *host_found = 1;
     return golden_nonce;
 }
+int HOST_TOOLS_connect(const char* server_ip, int server_port,struct sockaddr_in* server_addr,int* sockfd) {
+
+    if ((*sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        perror("[socket]");
+        return -1;
+    }
+    server_addr->sin_family = AF_INET;
+    server_addr->sin_port = htons(server_port);
+    server_addr->sin_addr.s_addr = inet_addr(server_ip); 
+    printf("Connected to bitcoin server\n");
+    return 0;
+}

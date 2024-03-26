@@ -3,6 +3,10 @@
 #include <dpu.h>
 #include <assert.h>
 #include "blockHeader.h"
+#include <errno.h>
+#include <sys/socket.h>
+#include <arpa/inet.h> 
+#include <netinet/in.h>
 #define DEBUG 1
 
 /**
@@ -54,8 +58,11 @@ void HOST_TOOLS_compile(uint8_t nb_tasklets);
 */
 uint32_t HOST_TOOLS_mine_stop_repeat( struct dpu_set_t set,blockHeader bh,uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nb_dpus,uint32_t nb_boot, uint32_t* host_found);
 
-
-
+/**
+ * @brief Connect to the bitcoin to a server using udp.
+ * 
+*/
+int HOST_TOOLS_connect(const char* server_ip, int server_port,struct sockaddr_in* server_addr,int* sockfd);
 
 
 #endif // HOST_TOOLS_H
