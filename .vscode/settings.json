@@ -11,7 +11,9 @@
         "dpu.h": "c",
         "host_tools.h": "c",
         "dpu_log.h": "c",
-        "hosttools.h": "c"
+        "hosttools.h": "c",
+        "time.h": "c",
+        "bitcoinserver.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
