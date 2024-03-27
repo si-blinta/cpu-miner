@@ -43,10 +43,9 @@ int main(int argc, char *argv[]) {
         case GET:
             printf("[SERVER] Received request block\n");
             generate_block_header(&block);
-            printf("[SERVER] Block generated\n\n");
-            print_block_header(block);
+            printf("[SERVER] Block generated\n");
             send_block(&client_addr,sockfd,&block,len);
-            printf("\n[SERVER] Block sent\n");
+            printf("[SERVER] Block sent\n");
             break;
         
         case PUT:
