@@ -141,40 +141,33 @@ uint32_t scan_hash_test(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uin
     for (uint32_t nonce = bh.nonce + nonce_start ; nonce <= nonce_end; nonce++) {
         bh.nonce = nonce; // Update nonce in block header // op1
         concat_block_header(bh,concatenated_header);      // op2
-        calc_sha_256(hash, concatenated_header, strlen(concatenated_header)); // op3
-        calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);                         // op4
+#if OPTIMISED
+        sha256((const unsigned char*)concatenated_header,strlen(concatenated_header),hash);
+        sha256(hash,SIZE_OF_SHA_256_HASH,hash);    
+#else
+        calc_sha_256(hash, concatenated_header, strlen(concatenated_header));
+        calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
+
+#endif //OPTIMISED
         tasklet_hashes_done++;                                                // op5
         if (compare_hashes(hash, target, SIZE_OF_SHA_256_HASH) < 0) {         //op6
         }
     }
     return tasklet_hashes_done;
 }
-uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end) {
-    uint8_t hash[SIZE_OF_SHA_256_HASH];
-    char concatenated_header[CONCAT_LENGTH];
-    for (uint32_t nonce = bh.nonce + nonce_start ; nonce < nonce_end; nonce++) {
-        if(finish != 0){
-            return UINT32_MAX;
-        }
-        bh.nonce = nonce; // Update nonce in block header
-        concat_block_header(bh,concatenated_header);
-        calc_sha_256(hash, concatenated_header, strlen(concatenated_header));
-        calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
-        if (compare_hashes(hash, target, SIZE_OF_SHA_256_HASH) < 0) {
-            return nonce; 
-            
-        }
-    }
-    return UINT32_MAX; // Return 0xffffffff if no valid hash is found within nonce range
-}
-int unit_test_double_sha256(char* input){
-  return 0;
-}
+
 void hash_rate_test(uint32_t nb_iterations){
     uint8_t hash[SIZE_OF_SHA_256_HASH];
     for(uint32_t i = 0; i < nb_iterations; i++){
+
+#if OPTIMISED
+        sha256(hash,SIZE_OF_SHA_256_HASH,hash);
+        sha256(hash,SIZE_OF_SHA_256_HASH,hash);   
+#else
         calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
         calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
+#endif    
+
     }
 
 }

@@ -1,6 +1,7 @@
 #ifndef BLOCK_HEADER_H
 #define BLOCK_HEADER_H
 #include "sha-256.h"
+#include "sha2.h"
 #ifndef DPU
 #include <time.h>
 //#include <curl/curl.h>
@@ -11,7 +12,7 @@
 #define CONCAT_LENGTH 161           // Size of concatenated blockHeader. : // 8 characters for each 32-bit int (hex) + 64 characters for each hash (hex) + null terminator
                                     // 8 + 64 + 64 + 8 + 8 + 8 + 1 = 161.
 #define TRAILING_ZEROS(x) ((x)+6)/2
-#define EASY
+#define OPTIMISED 1
 typedef struct {
     int32_t version;                // Version of the block
     uint8_t previous_hash[32];      // Hash of the previous block in the chain
@@ -96,23 +97,6 @@ int compare_hashes(const uint8_t *hash1, const uint8_t *hash2, size_t size);
  * @return The number of hashes done by a tasklet.
  */
 uint32_t scan_hash_test(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end);
-
-/**
- * @brief Mining function, trying a new nonce in every iteration to find the target hash.
- * @param bh The block header for the hashing test.
- * @param target The target hash.
- * @param nonce_start The first nonce value to be tested. 
- * @param nonce_end The maximum nonce value to be tested.
- * @return The nonce value that satisfies the condition, or 0xffffffff if not found.
- */
-uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t nonce_start,uint32_t nonce_end);
-
-/**
- *@brief This function will test if out double sha256 is working fine.By comparing the results
- *       with the results on this website : https://emn178.github.io/online-tools/double_sha256
- * @param input The String to hash.
-*/
-int unit_test_double_sha256(char* input);
 
 /**
  * @brief This function calls nb_iterations times double sha256 used to calculate hash rate.

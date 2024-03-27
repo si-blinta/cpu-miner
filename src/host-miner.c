@@ -60,5 +60,4 @@ out_failure:
   
   fprintf(stderr,"Usage %s [dpu] or [tasklet] or [all] then [hashrate] or [solution]\n",argv[0]);
   return -1;
- 
 }
