@@ -4,7 +4,7 @@
 #define DPU_DEBUG  0
 #define DPU_BINARY "bin/dpu-miner"
 #define BLOCK_HEADER_PACKET_SIZE 81
-#define BITCOIN_PORT 8080
+#define BITCOIN_PORT 9999
 #define BUFFER_SIZE 1024
 #define CONCAT_LENGTH 161          
 #define TRAILING_ZEROS(x) ((x)+6)/2
