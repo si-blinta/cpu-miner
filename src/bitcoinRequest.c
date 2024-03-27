@@ -58,12 +58,20 @@ int verify_block(blockHeader block_header){
     uint8_t concat_block[CONCAT_LENGTH];
     uint8_t block_hash[SIZE_OF_SHA_256_HASH];
     concat_block_header(block_header,concat_block);
-    
+#if OPTIMISED
+
+    sha256((const unsigned char*)concat_block, strlen(concat_block),block_hash);
+    sha256(block_hash, SIZE_OF_SHA_256_HASH,block_hash);
+
+#else
+
     calc_sha_256(block_hash,concat_block,strlen(concat_block));
     calc_sha_256(block_hash,block_hash,SIZE_OF_SHA_256_HASH);
 
+#endif//OPTIMISED
     if(compare_hashes(block_hash,target,SIZE_OF_SHA_256_HASH) < 0){
         printf("[SERVER] Block accepted \n[SERVER] Proof:\n\n");
+        print_block_header(block_header);
         print_256_bits_integer(block_hash,"block hash");
         print_256_bits_integer(target,"target hash");
         printf("\n");

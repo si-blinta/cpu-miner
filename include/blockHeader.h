@@ -1,6 +1,7 @@
 #ifndef BLOCK_HEADER_H
 #define BLOCK_HEADER_H
 #include "sha-256.h"
+#include "sha2.h"
 #ifndef DPU
 #include <time.h>
 #endif //HOST

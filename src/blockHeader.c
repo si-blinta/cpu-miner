@@ -149,8 +149,14 @@ uint32_t scan_hash(blockHeader bh, uint8_t target[SIZE_OF_SHA_256_HASH],uint32_t
     for (uint32_t nonce = bh.nonce + nonce_start ; nonce < nonce_end; nonce++) {
         bh.nonce = nonce; // Update nonce in block header
         concat_block_header(bh,concatenated_header);
+#if OPTIMISED
+        sha256((const unsigned char*)concatenated_header, strlen(concatenated_header),hash);
+        sha256(hash, SIZE_OF_SHA_256_HASH,hash);
+#else
         calc_sha_256(hash, concatenated_header, strlen(concatenated_header));
         calc_sha_256(hash,hash,SIZE_OF_SHA_256_HASH);
+
+#endif //OPTIMISED
         if (compare_hashes(hash, target, SIZE_OF_SHA_256_HASH) < 0) {
             *dpu_found = 1;
             return nonce; 
