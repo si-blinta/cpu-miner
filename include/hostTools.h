@@ -64,7 +64,7 @@ uint32_t HOST_TOOLS_mine_multiple_boot( struct dpu_set_t set,blockHeader bh,uint
                                     uint32_t nb_dpus,uint32_t nb_boots, uint32_t* host_found);
 
 /**
- * @brief Connect to the bitcoin to a server using udp.
+ * @brief Connect to a server using udp.
  * @param server_ip The server's IP.
  * @param server_port The server's port.
  * @param server_addr A pointer to a server address.
@@ -80,7 +80,7 @@ int HOST_TOOLS_connect(const char* server_ip, int server_port,struct sockaddr_in
  * @param set The dpu_set structure , this set must be allocated before the call.
  * @param nb_dpus The number of dpus used ,useful for dpus to compute their nonce space.
  * @param nb_boots The number of times we are booting the dpus, useful for dpus to compute their nonce space.
- * @param number_of_blocks_to_mine :)
+ * @param number_of_blocks_to_mine How many blocks to mine in the simulation.
 */
 
 void HOST_TOOLS_mine(struct sockaddr_in server_addr,int sockfd,struct dpu_set_t set,uint32_t nb_dpus,

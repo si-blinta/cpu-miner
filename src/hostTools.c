@@ -43,38 +43,61 @@ uint32_t HOST_TOOLS_mine_multiple_boot( struct dpu_set_t set,blockHeader bh,uint
     struct dpu_set_t dpu;
     uint32_t golden_nonce = UINT32_MAX;
     uint32_t found        = 0;
+    /**
+     * Broadcasting data to dpus.
+    */
+    
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_block_header", 0,&bh,sizeof(bh), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_target", 0,target,SIZE_OF_SHA_256_HASH * sizeof(uint8_t), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb", 0,&nb_dpus,sizeof(nb_dpus), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_nb_boots", 0,&nb_boots,sizeof(nb_boots), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_nonce", 0,&golden_nonce,sizeof(golden_nonce), DPU_XFER_DEFAULT));
     DPU_ASSERT(dpu_broadcast_to(set, "dpu_found", 0,&found,sizeof(found), DPU_XFER_DEFAULT));
+    
+    /**
+     * Sending IDs
+    */
+    
     HOST_TOOLS_send_id(set);
+    
     for(uint32_t i = 0; i < nb_boots ; i ++){
 #if HOST_DEBUG
             printf("BOOT #%d little endian nonce = %08x : found = %d\n",i,to_little_endian_32(golden_nonce),found);
 #endif//HOST_DEBUG         
         DPU_ASSERT(dpu_launch(set, DPU_SYNCHRONOUS));
+        
         DPU_FOREACH(set, dpu) {
+            /**
+             * Retrieving the found flag from DPUs.
+            */
+            
             DPU_ASSERT(dpu_copy_from(dpu,"dpu_found",0,&found,sizeof(uint32_t)));
             if(found){
 #if DPU_DEBUG
                 DPU_ASSERT(dpu_log_read(dpu,stdout));
 #endif//DPU_DEBUG                
+                /**
+                 * If found then retrieve the golden nonce.
+                */
+                
                 DPU_ASSERT(dpu_copy_from(dpu,"dpu_nonce",0,&golden_nonce,sizeof(uint32_t)));  
                 goto return_success;
             }
         }
     }
-    //DPU_ASSERT(dpu_free(set));
+    /**
+     * Update host_found flag
+    */
+
     *host_found = 0;
     return UINT32_MAX;
 
 return_success:
-    //DPU_ASSERT(dpu_free(set));
+
     *host_found = 1;
     return golden_nonce;
 }
+
 int HOST_TOOLS_connect(const char* server_ip, int server_port,struct sockaddr_in* server_addr,int* sockfd) {
 
     if ((*sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -90,26 +113,45 @@ int HOST_TOOLS_connect(const char* server_ip, int server_port,struct sockaddr_in
 
 void HOST_TOOLS_mine(struct sockaddr_in server_addr,int sockfd,struct dpu_set_t set,uint32_t nb_dpus,
                     size_t number_of_blocks_to_mine,uint32_t nb_boots){
+  
   blockHeader bh;
   uint32_t golden_nonce;
   uint32_t found = 0;
   uint8_t target[SIZE_OF_SHA_256_HASH];
   char buffer[BLOCK_HEADER_PACKET_SIZE];
   for(size_t i = 0 ; i < number_of_blocks_to_mine; i++){
+    
+    /**
+     * Request a block from the server
+    */
     printf("[HOST] Get block\n");
     get_block(&server_addr,sockfd);
     recvfrom(sockfd,buffer,BLOCK_HEADER_PACKET_SIZE,0,NULL,NULL);  
+    
+    /**
+     * Deserialize it and compute the target hash.
+    */
+
     printf("[HOST] Received block\n");
     deserialize(&bh,buffer+1);
     calculate_target_from_bits(bh.bits,target); 
     print_256_bits_integer(target,"Target Hash");
+
 #if HOST_DEBUG    
     print_block_header(bh);
 #endif//HOST_DEBUG
+    /**
+     * Run the mining function for the block.
+    */
+
     golden_nonce = HOST_TOOLS_mine_multiple_boot(set,bh,target,nb_dpus,nb_boots,&found);
     if(found){
+        /**
+         * If the block is mined , send it to the server.
+        */
+        
         bh.nonce = golden_nonce;      
-    printf("[HOST] Block sent\n");
+        printf("[HOST] Block sent\n");
         send_block(&server_addr,sockfd,&bh,sizeof(server_addr));
     }
   }
